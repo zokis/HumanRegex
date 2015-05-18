@@ -5,7 +5,7 @@ __version__ = '0.1.0'
 __author__ = 'Marcelo Fonseca Tambalo'
 
 
-class HumanRegex(object):
+class HumanRegex(str):
     _AND = 'AND'
     _OR = 'OR'
 
@@ -284,101 +284,79 @@ class FX(Flag):
     f = HR.verbose
 
 
-def ADD(value):
-    return HR().add(value)
+def ADD(value): return HR().add(value)
 
 
-def T(value):
-    return HR().then(value)
-F = T
+def T(value): return HR().then(value)
 
 
-def A(value):
-    return HR().any(value)
+def F(value): return HR().then(value)
 
 
-def AT():
-    return HR().anything()
+def A(value): return HR().any(value)
 
 
-def ATB(value):
-    return HR().anything_but(value)
+def AT(): return HR().anything()
 
 
-def EOL():
-    return HR().end_of_line()
+def ATB(value): return HR().anything_but(value)
 
 
-def MB(value):
-    return HR().maybe(value)
+def EOL(): return HR().end_of_line()
 
 
-def MTP():
-    return HR().multiple()
+def MB(value): return HR().maybe(value)
 
 
-def R(*args):
-    return HR().range(*args)
+def MTP(): return HR().multiple()
 
 
-def ST(value):
-    return HR().something(value)
+def R(*args): return HR().range(*args)
 
 
-def STB(value):
-    return HR().something_but(value)
+def ST(value): return HR().something(value)
 
 
-def SOL():
-    return HR().start_of_line()
+def STB(value): return HR().something_but(value)
 
 
-def BR():
-    return HR().br()
+def SOL(): return HR().start_of_line()
 
 
-def D():
-    return HR().digit()
+def BR(): return HR().br()
 
 
-def DS():
-    return HR().digits()
+def D(): return HR().digit()
 
 
-def ND():
-    return HR().non_digit()
+def DS(): return HR().digits()
 
 
-def NDS():
-    return HR().non_digits()
+def ND(): return HR().non_digit()
 
 
-def TAB():
-    return HR().tab()
+def NDS(): return HR().non_digits()
 
 
-def WS():
-    return HR().whitespace()
+def TAB(): return HR().tab()
 
 
-def NWS():
-    return HR().non_whitespace()
+def WS(): return HR().whitespace()
 
 
-def W():
-    return HR().word()
+def NWS(): return HR().non_whitespace()
 
 
-def NW():
-    return HR().non_word()
+def W(): return HR().word()
 
 
-def C():
-    return HR().char()
+def NW(): return HR().non_word()
 
 
-def NC():
-    return HR().non_char()
+def C(): return HR().char()
+
+
+def NC(): return HR().non_char()
 
 
 if __name__ == '__main__':
