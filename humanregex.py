@@ -187,7 +187,10 @@ class HumanRegex(str):
     def __exit__(self, exc_type, exc_value, traceback):
         return self
 
-    def _combine(self, other, op='AND'):
+    def __repr__(self):
+        return repr(str(self))
+
+    def _combine(self, other, op=_AND):
         if isinstance(other, Flag):
             Flag.set(other, self)
             return self
@@ -383,9 +386,9 @@ if __name__ == '__main__':
 
     # print (FI() | FS() | FX()) & T('g')
 
-    # email1 = HR().I().range(['A', 'Z'], ['0', '9'], '.', '_').multiple().then('@').range(['A', 'Z'], ['0', '9']).multiple().then('.').anything()
-    # print email1
-    # print email1.test("marcelo@Zokis.com")
+    email1 = HR().I().range(['A', 'Z'], ['0', '9'], '._').s().then('@').range(['A', 'Z'], ['0', '9']).multiple().then('.').anything()
+    print email1
+    print email1.test("marcelo@Zokis.com")
 
     az09s = R(['A', 'Z'], ['0', '9'], '.', '_') & MTP()
     email2 = FI() & az09s & T('@') & az09s & T('.') & az09s
