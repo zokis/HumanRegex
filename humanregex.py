@@ -1,8 +1,21 @@
+import itertools
 import re
 
 __title__ = 'HumanRegex'
 __version__ = '0.1.0'
 __author__ = 'Marcelo Fonseca Tambalo'
+
+
+class HumanMatch(dict):
+    def __getitem__(self, y):
+        try:
+            return super(HumanMatch, self).__getitem__(y)
+        except KeyError:
+            return None
+
+    def get(self, k, d=None):
+        ret = super(HumanMatch, self).get(k, d)
+        return d if ret is None else ret
 
 
 class HumanRegex(str):
@@ -22,9 +35,12 @@ class HumanRegex(str):
         self._unicode = False
         self._verbose = False
 
-    def add(self, value=None):
+    def add(self, value=None, name=None):
         if value:
-            self.source += value
+            if name is None:
+                self.source += value
+            else:
+                self.source += '(?P<{name}>{value})'.format(name=name, value=value)
         self.pattern = self.prefixes + self.source + self.suffixes
         return self
 
@@ -67,8 +83,26 @@ class HumanRegex(str):
         self.add("|")
         return self.then(value) if value else self
 
-    def range(self, *args):
-        f = r"([%s])"
+    def range(self, *args, **kwargs):
+        name = kwargs.pop('name', None)
+        if name is None:
+            f = r"([%s])"
+        else:
+            f = r"(?P<{name}>([%s]))".format(name=name)
+        r = []
+        for arg in args:
+            if isinstance(arg, basestring):
+                r.append(re.escape(arg))
+            else:
+                r.append("-".join(arg))
+        return self.add(f % ''.join(r))
+
+    def ranges(self, *args, **kwargs):
+        name = kwargs.pop('name', None)
+        if name is None:
+            f = r"([%s]+)"
+        else:
+            f = r"(?P<{name}>([%s]+))".format(name=name)
         r = []
         for arg in args:
             if isinstance(arg, basestring):
@@ -156,11 +190,19 @@ class HumanRegex(str):
     def compile(self):
         return re.compile(str(self), self.get_flags())
 
+    def findall(self, string):
+        return self.compile().findall(string)
+
     def groups(self, string):
-        return self.search().groups()
+        return self.search(string).groups()
 
     def groupdict(self, string):
-        return self.search().groupdict()
+        result = HumanMatch()
+        match = self.search(string)
+        result[0] = match.group()
+        result.update(enumerate(match.groups(), start=1))
+        result.update(match.groupdict())
+        return result
 
     def match(self, string):
         return self.compile().match(string)
@@ -176,7 +218,7 @@ class HumanRegex(str):
         return re.split(str(self), string, flags=self.get_flags())
 
     def test(self, string):
-        return True if self.match(string) else False
+        return True if len(self.findall(string)) else False
 
     def __str__(self):
         return r"%s" % self.pattern
@@ -189,6 +231,9 @@ class HumanRegex(str):
 
     def __repr__(self):
         return repr(str(self))
+
+    def __call__(self, string):
+        return self.groupdict(string)
 
     def _combine(self, other, op=_AND):
         if isinstance(other, Flag):
@@ -257,7 +302,12 @@ class Flag(object):
     def __and__(self, other):
         if isinstance(other, HR):
             return other & self
-        return super(Flag, self).__and__(other)
+        raise TypeError(
+            "unsupported operand type(s) for |: '%s' and '%s'" % (
+                type(self).__name__,
+                type(other).__name__
+            )
+        )
 
     def __repr__(self):
         return self.f.__name__
@@ -287,40 +337,44 @@ class FX(Flag):
     f = HR.verbose
 
 
-def ADD(value): return HR().add(value)
+def ADD(value, name=None): return HR().add(value, name=name)
+RE = ADD
 
 
-def T(value): return HR().then(value)
+def T(value, name=None): return HR().then(value)
 
 
-def F(value): return HR().then(value)
+def F(value, name=None): return HR().find(value)
 
 
-def A(value): return HR().any(value)
+def A(value, name=None): return HR().any(value)
 
 
 def AT(): return HR().anything()
 
 
-def ATB(value): return HR().anything_but(value)
+def ATB(value, name=None): return HR().anything_but(value)
 
 
 def EOL(): return HR().end_of_line()
 
 
-def MB(value): return HR().maybe(value)
+def MB(value, name=None): return HR().maybe(value)
 
 
 def MTP(): return HR().multiple()
 
 
-def R(*args): return HR().range(*args)
+def R(*args, **kwargs): return HR().range(*args, **kwargs)
 
 
-def ST(value): return HR().something(value)
+def RS(*args, **kwargs): return HR().ranges(*args, **kwargs)
 
 
-def STB(value): return HR().something_but(value)
+def ST(value, name=None): return HR().something(value)
+
+
+def STB(value, name=None): return HR().something_but(value)
 
 
 def SOL(): return HR().start_of_line()
@@ -363,34 +417,34 @@ def NC(): return HR().non_char()
 
 
 if __name__ == '__main__':
+    print (FI() & F("CAT")).replace("this is a cat", "dog")
 
-    # with HR().then('cat').OR('dog') as expression:
-    #     print expression.test('cat')
-    #     print expression.test('dog')
-    #     print expression.test('rat')
+    if F('dog').test('This is a dog'):
+        print 'Oh yeah'
 
-    # print T('cat') | T('dog')
+    re09 = RS(('0', '9'))
+    if re09.test('My lucky 25 number'):
+        print '1: Number found'
+    if re09.findall('My lucky 25 number')[0] == '25':
+        print '2: Number found'
+    re09_number = RS(('0', '9'), name='number')
+    if re09_number.groupdict('My lucky 25 number')['number'] == '25':
+        print '3: Number found'
+    print re09_number.groupdict('My lucky 25 number')['no_such_group']
+    # None
 
-    # print HR().find("red").replace("violets are red", "blue")
+    if bool(re09_number('My lucky 25 number')):
+        print '4: Number found'
+    if re09_number('My lucky 25 number')[0] == '25':
+        print '5: Number found'
+    if re09_number('My lucky 25 number')['number'] == '25':
+        print '6: Number found'
+    print re09_number('My lucky 25 number')['no_such_group']
+    # None
 
-    # print (FI() | F("RED")).replace("violets are red", "blue")
-
-    # print HR().add(r'\W+').split('Words, words, words.')
-
-    # x = (SOL() & T('http') & MB('S') & FI() | FS() & T('://') & MB('www.') & ATB(' ') & EOL())
-    # print x.get_flags()
-    # print x
-    # x = (HR().start_of_line().then('http').maybe('s').I().S().then('://').maybe('www.').anything_but(' ').end_of_line())
-    # print x.get_flags()
-    # print x
-
-    # print (FI() | FS() | FX()) & T('g')
-
-    email1 = HR().I().range(['A', 'Z'], ['0', '9'], '._').s().then('@').range(['A', 'Z'], ['0', '9']).multiple().then('.').anything()
-    print email1
-    print email1.test("marcelo@Zokis.com")
-
-    az09s = R(['A', 'Z'], ['0', '9'], '.', '_') & MTP()
-    email2 = FI() & az09s & T('@') & az09s & T('.') & az09s
-    print email2
-    print email2.test("marcelo.zokis@gmail.com")
+    print bool(RE('[0-9]+', name='number')('My lucky 25 number'))
+    # True
+    print RE('[0-9]+', name='number')('My lucky 25 number')[0]
+    # 25
+    print RE('[0-9]+', name='number')('My lucky 25 number')['number']
+    # 25
