@@ -37,6 +37,18 @@ class HumanRegex(object):
     def br(self):
         return self.add(r"(?:(?:\n)|(?:\r\n))")
 
+    def digit(self):
+        return self.add(r"\d")
+
+    def digits(self):
+        return self.add(r"\d+")
+
+    def non_digit(self):
+        return self.add(r"\D")
+
+    def non_digits(self):
+        return self.add(r"\D+")
+
     def end_of_line(self, enable=True):
         self.suffixes = "$" if enable else ""
         return self.add()
@@ -44,10 +56,9 @@ class HumanRegex(object):
     def maybe(self, value):
         return self.add("(?:" + re.escape(value) + ")?")
 
-    def multiple(self, value):
-        if not value.startswith('*') or not value.startswith('*'):
-            self.add("+")
-        return self.add(value)
+    def multiple(self):
+        return self.add("+")
+    s = multiple
 
     def OR(self, value=None):
         self.add("|")
@@ -55,7 +66,7 @@ class HumanRegex(object):
 
     def range(self, *args):
         for args in args:
-            self.add("([" + '-'.join(args) + "])")
+            self.add("([" + "-".join(args) + "])")
         return self
 
     def something(self):
@@ -71,12 +82,27 @@ class HumanRegex(object):
     def tab(self):
         return self.add(r"\t")
 
+    def whitespace(self):
+        return self.add(r"\s")
+
+    def non_whitespace(self):
+        return self.add(r"\S")
+
     def then(self, value):
         return self.add("(?:" + re.escape(value) + ")")
     find = then
 
     def word(self):
         return self.add(r"\w+")
+
+    def non_word(self):
+        return self.add(r"\W+")
+
+    def char(self):
+        return self.add(r"\w")
+
+    def non_char(self):
+        return self.add(r"\W")
 
     def dotall(self, enable=True):
         self._dotall = enable
@@ -132,41 +158,31 @@ class HumanRegex(object):
     def search(self, string):
         return self.compile().search(string)
 
+    def split(self, string):
+        return re.split(str(self), string, flags=self.get_flags())
+
     def test(self, string):
         return True if self.match(string) else False
 
     def __str__(self):
         return r"%s" % self.pattern
 
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        return self
+
 
 HR = HumanRegex
 
 if __name__ == '__main__':
-    expression = HR()\
-        .start_of_line()\
-        .then("http")\
-        .maybe("s")\
-        .then("://")\
-        .maybe("www.")\
-        .anything_but(" ")\
-        .end_of_line()
 
-    e1 = HR()\
-        .start_of_line()\
-        .then('b')\
-        .any('aeiou')\
-        .then('t')\
-        .end_of_line()
+    with HR().then('cat').OR('dog') as expression:
+        print expression.test('cat')
+        print expression.test('dog')
+        print expression.test('rat')
 
-    e2 = HR().then('cat').OR('dog')
-    print str(e2)
+    print HR().find("red").replace("violets are red", "blue")
 
-    print HR().find("roses").replace(
-        HR().find("red").replace(
-            "roses are red",
-            "blue"
-        ),
-        'violets'
-    )
-
-    print str(HR().start_of_line().range(['a', 'b'], ['X', 'Z']))
+    print HR().add(r'\W+').split('Words, words, words.')
