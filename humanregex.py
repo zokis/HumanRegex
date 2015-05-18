@@ -254,12 +254,7 @@ class Flag(object):
     def __and__(self, other):
         if isinstance(other, HR):
             return other & self
-        raise TypeError(
-            "unsupported operand type(s) for &: '%s' and '%s'" % (
-                type(self).__name__,
-                type(other).__name__
-            )
-        )
+        return super(Flag, self).__and__(other)
 
     def __repr__(self):
         return self.f.__name__
