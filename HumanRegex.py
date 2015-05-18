@@ -1,9 +1,8 @@
+import re
+
 __title__ = 'HumanRegex'
 __version__ = '0.1.0'
 __author__ = 'Marcelo Fonseca Tambalo'
-
-
-import re
 
 
 class HumanRegex(object):
@@ -12,9 +11,6 @@ class HumanRegex(object):
         self.prefixes = ''
         self.source = ''
         self.suffixes = ''
-
-        self.end_of_line_called = False
-        self.start_of_line_called = False
 
         self._dotall = False
         self._ignorecase = False
@@ -29,8 +25,8 @@ class HumanRegex(object):
         self.pattern = self.prefixes + self.source + self.suffixes
         return self
 
-    def any(self):
-        return self.add("[" + re.escape(value) + "]");
+    def any(self, value):
+        return self.add("[" + re.escape(value) + "]")
 
     def anything(self):
         return self.add("(?:.*)")
@@ -42,11 +38,9 @@ class HumanRegex(object):
         return self.add(r"(?:(?:\n)|(?:\r\n))")
 
     def end_of_line(self, enable=True):
-        if not self.end_of_line_called:
-            self.end_of_line_called = True
-            self.suffixes = enable and "$" or "";
-            return self.add()
-        raise Exception()
+        self.end_of_line_called = True
+        self.suffixes = enable and "$" or ""
+        return self.add()
 
     def find(self, value):
         return self.then(value)
@@ -55,7 +49,7 @@ class HumanRegex(object):
         return self.add("(?:" + re.escape(value) + ")?")
 
     def multiple(self, value):
-        if not value.startswith('*') or not value.startssith('*'):
+        if not value.startswith('*') or not value.startswith('*'):
             self.add("+")
         return self.add(value)
 
@@ -66,11 +60,9 @@ class HumanRegex(object):
         return self.add("(?:[^" + re.escape(value) + "]+)")
 
     def start_of_line(self, enable=True):
-        if not self.start_of_line_called:
-            self.start_of_line_called = True
-            self.prefixes = enable and "^" or "";
-            return self.add()
-        raise Exception()
+        self.start_of_line_called = True
+        self.prefixes = enable and "^" or ""
+        return self.add()
 
     def tab(self):
         return self.add(r"\t")
@@ -132,7 +124,6 @@ class HumanRegex(object):
 
     def test(self, string):
         return True if self.match(string) else False
-
 
     def __str__(self):
         return r"%s" % self.pattern
