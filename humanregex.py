@@ -68,9 +68,14 @@ class HumanRegex(object):
         return self.then(value) if value else self
 
     def range(self, *args):
-        for args in args:
-            self.add("([" + "-".join(args) + "])")
-        return self
+        f = r"([%s])"
+        r = []
+        for arg in args:
+            if isinstance(arg, basestring):
+                r.append(re.escape(arg))
+            else:
+                r.append("-".join(arg))
+        return self.add(f % ''.join(r))
 
     def something(self):
         return self.add("(?:.+)")
@@ -201,8 +206,8 @@ class HumanRegex(object):
         hr._verbose = self._verbose | other._verbose
 
         hr.prefixes = self.prefixes if self.prefixes else other.prefixes
-        hr.add(self.source)
         hr.suffixes = other.suffixes if other.suffixes else self.suffixes
+        hr.add(self.source)
         if op == 'OR':
             hr.OR()
         return hr.add(other.source)
@@ -223,6 +228,11 @@ class Flags(set):
             return other | self
         return super(Flags, self).__or__(other)
 
+    def __and__(self, other):
+        if isinstance(other, (Flag, HR)):
+            return other & self
+        return super(Flags, self).__and__(other)
+
 
 class Flag(object):
     def __init__(self, enable=True):
@@ -240,6 +250,16 @@ class Flag(object):
             return flgs
         else:
             return other | self
+
+    def __and__(self, other):
+        if isinstance(other, HR):
+            return other & self
+        raise TypeError(
+            "unsupported operand type(s) for &: '%s' and '%s'" % (
+                type(self).__name__,
+                type(other).__name__
+            )
+        )
 
     def __repr__(self):
         return self.f.__name__
@@ -282,8 +302,8 @@ def A(value):
     return HR().any(value)
 
 
-def AT(value):
-    return HR().anything(value)
+def AT():
+    return HR().anything()
 
 
 def ATB(value):
@@ -381,11 +401,20 @@ if __name__ == '__main__':
 
     # print HR().add(r'\W+').split('Words, words, words.')
 
-    # x = (SOL() & T('http') & MB('S') | FI() | FS() | T('://') & MB('www.') & ATB(' ') & EOL())
-    # print x.get_flags()
-    # print x
-    # x = (HR().start_of_line().then('http').maybe('s').I().S().then('://').maybe('www.').anything_but(' ').end_of_line())
-    # print x.get_flags()
-    # print x
+    x = (SOL() & T('http') & MB('S') & FI() | FS() & T('://') & MB('www.') & ATB(' ') & EOL())
+    print x.get_flags()
+    print x
+    x = (HR().start_of_line().then('http').maybe('s').I().S().then('://').maybe('www.').anything_but(' ').end_of_line())
+    print x.get_flags()
+    print x
 
-    print FI() | FS() | FX()
+    print (FI() | FS() | FX()) & T('g')
+
+    email1 = HR().I().range(['A', 'Z'], ['0', '9'], '.', '_').multiple().then('@').range(['A', 'Z'], ['0', '9']).multiple().then('.').anything()
+    print email1
+    print email1.test("marcelo@Zokis.com")
+
+    az09s = R(['A', 'Z'], ['0', '9'], '.', '_') & MTP()
+    email2 = FI() & az09s & T('@') & az09s & T('.') & AT()
+    print email2
+    print email2.test("marcelo@Zokis.com")
