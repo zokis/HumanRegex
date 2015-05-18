@@ -6,8 +6,8 @@ __author__ = 'Marcelo Fonseca Tambalo'
 
 
 class HumanRegex(object):
-    AND = 'AND'
-    OR = 'OR'
+    _AND = 'AND'
+    _OR = 'OR'
 
     def __init__(self):
         self.pattern = ''
@@ -213,10 +213,10 @@ class HumanRegex(object):
         return hr.add(other.source)
 
     def __or__(self, other):
-        return self._combine(other, self.OR)
+        return self._combine(other, self._OR)
 
     def __and__(self, other):
-        return self._combine(other, self.AND)
+        return self._combine(other, self._AND)
 
 
 HR = HumanRegex
@@ -388,7 +388,7 @@ if __name__ == '__main__':
     #     print expression.test('dog')
     #     print expression.test('rat')
 
-    # print str(T('cat') | T('dog'))
+    # print T('cat') | T('dog')
 
     # print HR().find("red").replace("violets are red", "blue")
 
@@ -396,20 +396,20 @@ if __name__ == '__main__':
 
     # print HR().add(r'\W+').split('Words, words, words.')
 
-    x = (SOL() & T('http') & MB('S') & FI() | FS() & T('://') & MB('www.') & ATB(' ') & EOL())
-    print x.get_flags()
-    print x
-    x = (HR().start_of_line().then('http').maybe('s').I().S().then('://').maybe('www.').anything_but(' ').end_of_line())
-    print x.get_flags()
-    print x
+    # x = (SOL() & T('http') & MB('S') & FI() | FS() & T('://') & MB('www.') & ATB(' ') & EOL())
+    # print x.get_flags()
+    # print x
+    # x = (HR().start_of_line().then('http').maybe('s').I().S().then('://').maybe('www.').anything_but(' ').end_of_line())
+    # print x.get_flags()
+    # print x
 
-    print (FI() | FS() | FX()) & T('g')
+    # print (FI() | FS() | FX()) & T('g')
 
-    email1 = HR().I().range(['A', 'Z'], ['0', '9'], '.', '_').multiple().then('@').range(['A', 'Z'], ['0', '9']).multiple().then('.').anything()
-    print email1
-    print email1.test("marcelo@Zokis.com")
+    # email1 = HR().I().range(['A', 'Z'], ['0', '9'], '.', '_').multiple().then('@').range(['A', 'Z'], ['0', '9']).multiple().then('.').anything()
+    # print email1
+    # print email1.test("marcelo@Zokis.com")
 
     az09s = R(['A', 'Z'], ['0', '9'], '.', '_') & MTP()
-    email2 = FI() & az09s & T('@') & az09s & T('.') & AT()
+    email2 = FI() & az09s & T('@') & az09s & T('.') & az09s
     print email2
-    print email2.test("marcelo@Zokis.com")
+    print email2.test("marcelo.zokis@gmail.com")
