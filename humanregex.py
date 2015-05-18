@@ -6,6 +6,9 @@ __author__ = 'Marcelo Fonseca Tambalo'
 
 
 class HumanRegex(object):
+    AND = 'AND'
+    OR = 'OR'
+
     def __init__(self):
         self.pattern = ''
         self.prefixes = ''
@@ -106,27 +109,33 @@ class HumanRegex(object):
 
     def dotall(self, enable=True):
         self._dotall = enable
+        return self
     S = dotall
 
     def ignorecase(self, enable=True):
         self._ignorecase = enable
+        return self
     I = ignorecase
 
     def locale(self, enable=True):
         self._locale = enable
+        return self
     L = locale
 
     def multiline(self, enable=True):
         self._multiline = enable
+        return self
     M = multiline
 
     def unicode(self, enable=True):
         self._unicode = enable
+        return self
 
     def U(self, enable=True): return self.unicode(enable)
 
     def verbose(self, enable=True):
         self._verbose = enable
+        return self
     X = verbose
 
     def get_flags(self):
@@ -173,16 +182,210 @@ class HumanRegex(object):
     def __exit__(self, exc_type, exc_value, traceback):
         return self
 
+    def _combine(self, other, op='AND'):
+        if isinstance(other, Flag):
+            Flag.set(other, self)
+            return self
+        elif isinstance(other, Flags):
+            for flag in other:
+                flag.set(self)
+            return self
+
+        hr = HumanRegex()
+
+        hr._dotall = self._dotall | other._dotall
+        hr._ignorecase = self._ignorecase | other._ignorecase
+        hr._locale = self._locale | other._locale
+        hr._multiline = self._multiline | other._multiline
+        hr._unicode = self._unicode | other._unicode
+        hr._verbose = self._verbose | other._verbose
+
+        hr.prefixes = self.prefixes if self.prefixes else other.prefixes
+        hr.add(self.source)
+        hr.suffixes = other.suffixes if other.suffixes else self.suffixes
+        if op == 'OR':
+            hr.OR()
+        return hr.add(other.source)
+
+    def __or__(self, other):
+        return self._combine(other, self.OR)
+
+    def __and__(self, other):
+        return self._combine(other, self.AND)
+
 
 HR = HumanRegex
 
+
+class Flags(set):
+    def __or__(self, other):
+        if isinstance(other, (Flag, HR)):
+            return other | self
+        return super(Flags, self).__or__(other)
+
+
+class Flag(object):
+    def __init__(self, enable=True):
+        self.enable = enable
+
+    def set(self, hr):
+        self.f(hr, self.enable)
+
+    def __or__(self, other):
+        if isinstance(other, Flag):
+            return Flags([self, other])
+        elif isinstance(other, Flags):
+            flgs = Flags(other)
+            flgs.add(self)
+            return flgs
+        else:
+            return other | self
+
+    def __repr__(self):
+        return self.f.__name__
+
+
+class FS(Flag):
+    f = HR.dotall
+
+
+class FI(Flag):
+    f = HR.ignorecase
+
+
+class FL(Flag):
+    f = HR.locale
+
+
+class FM(Flag):
+    f = HR.multiline
+
+
+class FU(Flag):
+    f = HR.unicode
+
+
+class FX(Flag):
+    f = HR.verbose
+
+
+def ADD(value):
+    return HR().add(value)
+
+
+def T(value):
+    return HR().then(value)
+F = T
+
+
+def A(value):
+    return HR().any(value)
+
+
+def AT(value):
+    return HR().anything(value)
+
+
+def ATB(value):
+    return HR().anything_but(value)
+
+
+def EOL():
+    return HR().end_of_line()
+
+
+def MB(value):
+    return HR().maybe(value)
+
+
+def MTP():
+    return HR().multiple()
+
+
+def R(*args):
+    return HR().range(*args)
+
+
+def ST(value):
+    return HR().something(value)
+
+
+def STB(value):
+    return HR().something_but(value)
+
+
+def SOL():
+    return HR().start_of_line()
+
+
+def BR():
+    return HR().br()
+
+
+def D():
+    return HR().digit()
+
+
+def DS():
+    return HR().digits()
+
+
+def ND():
+    return HR().non_digit()
+
+
+def NDS():
+    return HR().non_digits()
+
+
+def TAB():
+    return HR().tab()
+
+
+def WS():
+    return HR().whitespace()
+
+
+def NWS():
+    return HR().non_whitespace()
+
+
+def W():
+    return HR().word()
+
+
+def NW():
+    return HR().non_word()
+
+
+def C():
+    return HR().char()
+
+
+def NC():
+    return HR().non_char()
+
+
 if __name__ == '__main__':
 
-    with HR().then('cat').OR('dog') as expression:
-        print expression.test('cat')
-        print expression.test('dog')
-        print expression.test('rat')
+    # with HR().then('cat').OR('dog') as expression:
+    #     print expression.test('cat')
+    #     print expression.test('dog')
+    #     print expression.test('rat')
 
-    print HR().find("red").replace("violets are red", "blue")
+    # print str(T('cat') | T('dog'))
 
-    print HR().add(r'\W+').split('Words, words, words.')
+    # print HR().find("red").replace("violets are red", "blue")
+
+    # print (FI() | F("RED")).replace("violets are red", "blue")
+
+    # print HR().add(r'\W+').split('Words, words, words.')
+
+    # x = (SOL() & T('http') & MB('S') | FI() | FS() | T('://') & MB('www.') & ATB(' ') & EOL())
+    # print x.get_flags()
+    # print x
+    # x = (HR().start_of_line().then('http').maybe('s').I().S().then('://').maybe('www.').anything_but(' ').end_of_line())
+    # print x.get_flags()
+    # print x
+
+    print FI() | FS() | FX()
