@@ -229,7 +229,7 @@ class Flags(set):
         return super(Flags, self).__or__(other)
 
     def __and__(self, other):
-        if isinstance(other, (Flag, HR)):
+        if isinstance(other, HR):
             return other & self
         return super(Flags, self).__and__(other)
 
