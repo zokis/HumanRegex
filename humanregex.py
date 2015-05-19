@@ -344,13 +344,13 @@ def F(value, name=None): return HR().find(value, name=name)
 def A(value, name=None): return HR().any(value, name=name)
 
 
-def AT(name=None): return HR().anything(name, name=name)
+def AT(name=None): return HR().anything(name=name)
 
 
 def ATB(value, name=None): return HR().anything_but(value, name=name)
 
 
-def EOL(): return HR().end_of_line()
+def EOL(enable=True): return HR().end_of_line(enable)
 
 
 def MB(value, name=None): return HR().maybe(value)
@@ -371,7 +371,7 @@ def ST(name=None): return HR().something(name=name)
 def STB(value, name=None): return HR().something_but(value, name=name)
 
 
-def SOL(): return HR().start_of_line()
+def SOL(enable=True): return HR().start_of_line(enable)
 
 
 def BR(): return HR().br()
@@ -411,21 +411,20 @@ def NC(name=None): return HR().non_char(name=name)
 
 
 if __name__ == '__main__':
-    my_regex = DS()
-    print my_regex
-    # >> \d+
+    my_re = HR().find('cat')
+    my_match = my_re('CAT or dog')
+    print bool(my_match)
+    # >> False
+    my_re = my_re.ignorecase()
+    my_match = my_re('CAT or dog')
+    print bool(my_match)
+    # >> True
 
-    if bool(my_regex('number: 25')):
-        print 'Regex Ok'
-    # >> Regex Ok
-    my_match = my_regex('number: 25')
-    if my_match[0] == '25':
-        print '25'
-    # >> 25
-
-    my_named_regex = DS(name='number')
-    print my_named_regex
-    # >> (?P<number>\d+)
-    if my_named_regex('number: 25')['number'] == '25':
-        print 'number 25'
-    # >> number 25
+    my_re = SOL() & F('DOG')
+    my_match = my_re('CAT or \ndog')
+    print bool(my_match)
+    # >> False
+    my_re = my_re & FI() | FM()
+    my_match = my_re('CAT or \ndog')
+    print bool(my_match)
+    # >> True
