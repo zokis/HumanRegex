@@ -11,14 +11,14 @@ from humanregex import RE
 my_regex = RE('[0-9]+')
 if bool(my_regex('number: 25')):
     print 'Regex Ok'
-    # >> Regex Ok
+# >> Regex Ok
 my_match = my_regex('number: 25')
 if my_match[0] == '25':
     print '25'
-    # >> 25
+# >> 25
 if RE('(?P<number>[0-9]+)')('number: 25')['number'] == '25':
     print 'number 25'
-    # >> number 25
+# >> number 25
 ```
 ### Tests if the email is valid and captures the account and the provider
 ```python
