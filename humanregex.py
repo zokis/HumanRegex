@@ -365,10 +365,10 @@ def R(*args, **kwargs): return HR().range(*args, **kwargs)
 def RS(*args, **kwargs): return HR().ranges(*args, **kwargs)
 
 
-def ST(value, name=None): return HR().something(value)
+def ST(name=None): return HR().something(name=name)
 
 
-def STB(value, name=None): return HR().something_but(value)
+def STB(value, name=None): return HR().something_but(value, name=name)
 
 
 def SOL(): return HR().start_of_line()
@@ -411,12 +411,9 @@ def NC(name=None): return HR().non_char(name=name)
 
 
 if __name__ == '__main__':
-    print bool(D()('My lucky 25 number'))
-    # True
-    print RE('[0-9]+')('My lucky 25 number')[0]
-    # 25
-    print RE('[0-9]+', name='number')('My lucky 25 number')['number']
-    # 25
-
-    f = "Thomazini faz pilates"
-    print HR().then('t', name='x').ignorecase().anything_but('r', name='rtr')(f)
+    if bool(RE('[0-9]+')('number: 25')):
+        print 'OK'
+    if RE('[0-9]+')('number: 25')[0] == '25':
+        print 'OK'
+    if RE('[0-9]+', name='number')('number: 25')['number'] == '25':
+        print 'OK'
