@@ -35,7 +35,7 @@ if RE('(?P<number>[0-9]+)')('number: 25')['number'] == '25':
 
 ### Tests if the email is valid and captures the account and the provider
 ```python
-my_re = RE(r'(?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)')
+my_re = RE(r'(?P<account>[A-Za-z0-9+_.]+)\@(?P<provider>[A-Za-z0-9]+)\..+')
 my_match = my_re('my_email.1+github@Provider.com')
 print my_match['account']
 # >> my_email.1+github
