@@ -1,133 +1,143 @@
-Welcome to HumanRegex
-=====================
-
-Quickstart
-==========
+HumanRegex
+=======================
 
 
-Test regex
+## Examples
+
+### Testing if the string contains digits
 ```python
-if bool(RE('[0-9]+')('number: 25')):
+from humanregex import re
+
+my_regex = RE('[0-9]+')
+if bool(my_regex('number: 25')):
     print 'Regex Ok'
     # >> Regex Ok
-if RE('[0-9]+')('number: 25')[0] == '25':
+my_match = my_regex('number: 25')
+if my_match[0] == '25':
     print '25'
     # >> 25
-if RE('[0-9]+', name='number')('number: 25')['number'] == '25':
+if RE('(?P<number>[0-9]+)')('number: 25')['number'] == '25':
+    print 'number 25'
+    # >> number 25
+```
+### Tests if the email is valid and captures the account and the provider
+```python
+my_regex = RE(r'(?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)')
+my_match = my_regex('my_email.1+github@Provider.com')
+print my_match['account']
+print my_match['provider']
+```
+
+### Replacing strings
+```python
+from humanregex import RE
+
+print RE('(?:red)').replace("violets are red", 'blue')
+# >> violets are blue
+```
+
+### Using verbal expressions for the same examples
+```python
+from humanregex import HumanRegex as HR
+
+my_regex = HR().digits()
+if bool(my_regex('number: 25')):
+    print 'Regex Ok'
+    # >> Regex Ok
+my_match = my_regex('number: 25')
+if my_match[0] == '25':
+    print '25'
+    # >> 25
+if HR().digits(name='number')('number: 25')['number'] == '25':
+    print 'number 25'
+    # >> number 25
+
+```
+
+```python
+from humanregex import HumanRegex as HR
+
+az = ['a', 'z']
+AZ = ['A', 'Z']
+_09 = ['0', '9']
+special = '_.+'
+
+my_regex = HR().ranges(
+    AZ, az,
+    _09, special,
+    name='account'
+).then('@').ranges(
+    AZ, az, _09,
+    name='provider'
+).then('.').anything()
+my_match = my_regex('my_email.1+github@Provider.com')
+print my_regex
+# >> (?P<account>([A-Za-z0-9\_\.\+]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.*)
+print my_match['account']
+# >> my_email.1+github
+print my_match['provider']
+# >> Provider
+```
+
+```python
+from humanregex import HR
+
+print HR().find('red').replace("violets are red", 'blue')
+# >> violets are blue
+```
+
+### Os mesmos exemplos mas usando atalhos e combinações
+
+```python
+from humanregex import RS
+
+my_regex = RS(['0', '9'])
+print my_regex
+# >> ([0-9]+)
+
+if bool(my_regex('number: 25')):
+    print 'Regex Ok'
+    # >> Regex Ok
+my_match = my_regex('number: 25')
+if my_match[0] == '25':
+    print '25'
+    # >> 25
+
+my_named_regex = RS(['0', '9'], name='number')
+print my_named_regex
+# >> (?P<number>([0-9]+))
+if my_named_regex('number: 25')['number'] == '25':
     print 'number 25'
     # >> number 25
 ```
 
-More complex regex
-(?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)
-
 ```python
-email_re = RS(
-        ['A', 'Z'], ['a', 'z'], ['0', '9'], '+_.',
-        name='account'
-    ) & T('@') & RS(
-        ['A', 'Z'], ['a', 'z'], ['0', '9'],
-        name='provider'
-    ) & T('.') & ST()
-email_match = email_re('my_email.1+github@Provider.com')
-print email_re
-# >> (?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)
-print email_match['account']
+from humanregex import RS, T, AT
+
+az = ['a', 'z']
+AZ = ['A', 'Z']
+_09 = ['0', '9']
+special = '_.+'
+
+my_regex = RS(
+    AZ, az, _09, special,
+    name='account'
+) & T('@') & RS(
+    AZ, az, _09,
+    name='provider'
+) & AT()
+my_match = my_regex('my_email.1+github@Provider.com')
+print my_regex
+# >> (?P<account>([A-Za-z0-9\_\.\+]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:.*)
+print my_match['account']
 # >> my_email.1+github
-print email_match['provider']
+print my_match['provider']
 # >> Provider
-
-# --- OR ---
-
-email_re = HR().ranges(
-        ['A', 'Z'], ['a', 'z'], ['0', '9'], '+_.',
-        name='account'
-    ).then('@').ranges(
-        ['A', 'Z'], ['a', 'z'], ['0', '9'],
-        name='provider'
-    ).then('.').something()
-email_match = email_re('my_email.2@provider.com.br')
-print email_re
-# >> (?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)
-print email_match['account']
-# >> my_email.2
-print email_match['provider']
-# >> provider
 ```
-
-Flags
 
 ```python
-simple_email_re = FI() & W(name='account') & (
-        FS() | FM() | FU()
-    ) & T('@') & W(name='provider') & T('.') & W()
-simple_email_match = simple_email_re('my_email_3@prOvider.com')
-print simple_email_match['account']
-# >> my_email_3
-print simple_email_match['provider']
-# >> prOvider
+from humanregex import F
 
-# --- OR ---
-
-simple_email_re = HumanRegex().ignorecase().word(
-        name='account'
-    ).dotall().multiline().unicode().then('@').word(
-        name='provider'
-    ).then('.').word()
-simple_email_match = simple_email_re('my_email_4@proVider.com')
-print simple_email_match['account']
-# >> my_email_4
-print simple_email_match['provider']
-# >> proVider
-
-# --- OR ---
-
-simple_email_re = HR().I().word(
-        name='account'
-    ).S().M().U().then('@').word(
-        name='provider'
-    ).then('.').word()
-simple_email_match = simple_email_re('my_email_5@provIder.com')
-print simple_email_match['account']
-# >> my_email_3
-print simple_email_match['provider']
-# >> provIder
+print F('red').replace("violets are red", 'blue')
+# >> violets are blue
 ```
-
-
-LIST:
-
-    ADD .add
-    RE  .add
-    T   .then
-    F   .find
-    A   .any
-    AT  .anything  
-    ATB .anything_but
-    EOL .end_of_line
-    MB  .maybe
-    MTP .multiple
-    R   .range
-    RS  .ranges
-    ST  .something
-    STB .something_but
-    SOL .start_of_line
-    BR  .br
-    D   .digit
-    DS  .digits
-    ND  .non_digit
-    NDS .non_digits
-    TAB .tab
-    WS  .whitespace
-    NWS .non_whitespace
-    W   .word
-    NW  .non_word
-    C   .char
-    NC  .non_char
-
-    FS .dotall      .S
-    FI .ignorecase  .I
-    FL .locale      .L
-    FM .multiline   .M
-    FU .unicode     .U
-    FX .verbose     .X
