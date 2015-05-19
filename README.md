@@ -88,7 +88,7 @@ print HR().find('red').replace("violets are red", 'blue')
 # >> violets are blue
 ```
 
-### Os mesmos exemplos mas usando atalhos e combinações
+### The same examples but using shortcuts and combinations
 
 ```python
 from humanregex import RS
