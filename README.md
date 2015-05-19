@@ -104,13 +104,23 @@ print HR().find('red').replace("violets are red", 'blue')
 ### Combinations
 
 ```python
-my_combination = RE('([0-9]{2})') | RE('([a-z]{2})')
-print "regex: ", my_combination
-# >> regex:  ([0-9]{2})|([a-z]{2})
-print "av: ", my_combination('av: 159')[0]
-# >> av:  av
-print "01: ", my_combination('01: avsb')[0]
-# >> 01:  01
+alids = ['abacate', '42', 'tomate', '25']
+
+valid_comb = T(valids[0])
+for valid in valids[1:]:
+    valid_comb |= T(valid)
+
+valids = ADD(valid_comb, name='valid')
+my_combination = SOL() & T('{') & valids & T('}') & EOL()
+print my_combination
+# >> ^(?:\{)(?P<valid>(?:abacate)|(?:42)|(?:tomate)|(?:25))(?:\})$
+print my_combination('{42}')['valid']
+# >> 42
+print my_combination('{abacate}')['valid']
+# >> abacate
+print my_combination('{invalid}')['valid']
+# >> None
+
 
 x = HR().then('@').word(name='p')
 y = HR().char(name='c').then('.')

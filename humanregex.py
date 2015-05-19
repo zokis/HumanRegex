@@ -36,8 +36,13 @@ class HumanRegex(str):
         self._unicode = False
         self._verbose = False
 
+    def escape(self, value):
+        return re.escape(value)
+
     def add(self, value=None, name=None):
-        if value:
+        if value is not None:
+            if isinstance(value, HumanRegex):
+                value = str(value)
             if name is None:
                 self.source += value
             else:
@@ -46,13 +51,13 @@ class HumanRegex(str):
         return self
 
     def any(self, value, name=None):
-        return self.add("[" + re.escape(value) + "]", name=name)
+        return self.add("[" + self.escape(value) + "]", name=name)
 
     def anything(self, name=None):
         return self.add(r"(?:.*)", name=name)
 
     def anything_but(self, value, name=None):
-        return self.add("(?:[^" + re.escape(value) + "]*)", name=name)
+        return self.add("(?:[^" + self.escape(value) + "]*)", name=name)
 
     def br(self):
         return self.add(r"(?:(?:\n)|(?:\r\n))")
@@ -62,6 +67,13 @@ class HumanRegex(str):
 
     def digits(self, name=None):
         return self.add(r"\d+", name=name)
+
+    def group(self, value, name=None):
+        if isinstance(value, HumanRegex):
+            value = str(value)
+        else:
+            value = self.escape(value)
+        return self.add("(" + value + ")", name=name)
 
     def non_digit(self, name=None):
         return self.add(r"\D", name=name)
@@ -74,7 +86,7 @@ class HumanRegex(str):
         return self.add()
 
     def maybe(self, value, name=None):
-        return self.add("(?:" + re.escape(value) + ")?", name=name)
+        return self.add("(?:" + self.escape(value) + ")?", name=name)
 
     def multiple(self):
         return self.add(r"+")
@@ -89,7 +101,7 @@ class HumanRegex(str):
         r = []
         for arg in args:
             if isinstance(arg, basestring):
-                r.append(re.escape(arg))
+                r.append(self.escape(arg))
             else:
                 r.append("-".join(arg))
         return self.add(r"([%s])" % ''.join(r), name=name)
@@ -99,7 +111,7 @@ class HumanRegex(str):
         r = []
         for arg in args:
             if isinstance(arg, basestring):
-                r.append(re.escape(arg))
+                r.append(self.escape(arg))
             else:
                 r.append("-".join(arg))
         return self.add(r"([%s]+)" % ''.join(r), name=name)
@@ -108,7 +120,7 @@ class HumanRegex(str):
         return self.add(r"(?:.+)", name=name)
 
     def something_but(self, value, name=None):
-        return self.add("(?:[^" + re.escape(value) + "]+)", name=name)
+        return self.add("(?:[^" + self.escape(value) + "]+)", name=name)
 
     def start_of_line(self, enable=True):
         self.prefixes = "^" if enable else ""
@@ -124,7 +136,7 @@ class HumanRegex(str):
         return self.add(r"\S")
 
     def then(self, value, name=None):
-        return self.add("(?:" + re.escape(value) + ")", name=name)
+        return self.add("(?:" + self.escape(value) + ")", name=name)
     find = then
 
     def word(self, name=None):
@@ -331,7 +343,7 @@ class FX(Flag):
     f = HR.verbose
 
 
-def ADD(value, name=None): return HR().add(value, name=name)
+def ADD(value=None, name=None): return HR().add(value, name=name)
 RE = ADD
 
 
@@ -339,6 +351,9 @@ def T(value, name=None): return HR().then(value, name=name)
 
 
 def F(value, name=None): return HR().find(value, name=name)
+
+
+def G(value, name=None): return HR().group(value, name=name)
 
 
 def A(value, name=None): return HR().any(value, name=name)
@@ -411,20 +426,19 @@ def NC(name=None): return HR().non_char(name=name)
 
 
 if __name__ == '__main__':
-    my_re = HR().find('cat')
-    my_match = my_re('CAT or dog')
-    print bool(my_match)
-    # >> False
-    my_re = my_re.ignorecase()
-    my_match = my_re('CAT or dog')
-    print bool(my_match)
-    # >> True
+    valids = ['abacate', '42', 'tomate', '25']
 
-    my_re = SOL() & F('DOG')
-    my_match = my_re('CAT or \ndog')
-    print bool(my_match)
-    # >> False
-    my_re = my_re & FI() | FM()
-    my_match = my_re('CAT or \ndog')
-    print bool(my_match)
-    # >> True
+    valid_comb = T(valids[0])
+    for valid in valids[1:]:
+        valid_comb |= T(valid)
+
+    valids = ADD(valid_comb, name='valid')
+    my_combination = SOL() & T('{') & valids & T('}') & EOL()
+    print my_combination
+    # >> ^(?:\{)(?P<valid>(?:abacate)|(?:42)|(?:tomate)|(?:25))(?:\})$
+    print my_combination('{42}')['valid']
+    # >> 42
+    print my_combination('{abacate}')['valid']
+    # >> abacate
+    print my_combination('{invalid}')['valid']
+    # >> None
