@@ -93,24 +93,24 @@ print HR().find('red').replace("violets are red", 'blue')
 ```python
 from humanregex import RS
 
-my_regex = RS(['0', '9'])
+my_regex = DS()
 print my_regex
-# >> ([0-9]+)
+# >> \d+
 
 if bool(my_regex('number: 25')):
     print 'Regex Ok'
-    # >> Regex Ok
+# >> Regex Ok
 my_match = my_regex('number: 25')
 if my_match[0] == '25':
     print '25'
-    # >> 25
+# >> 25
 
-my_named_regex = RS(['0', '9'], name='number')
+my_named_regex = DS(name='number')
 print my_named_regex
-# >> (?P<number>([0-9]+))
+# >> (?P<number>\d+)
 if my_named_regex('number: 25')['number'] == '25':
     print 'number 25'
-    # >> number 25
+# >> number 25
 ```
 
 ```python
