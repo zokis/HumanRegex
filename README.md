@@ -6,7 +6,7 @@ HumanRegex
 
 ### Testing if the string contains digits
 ```python
-from humanregex import re
+from humanregex import RE
 
 my_regex = RE('[0-9]+')
 if bool(my_regex('number: 25')):
