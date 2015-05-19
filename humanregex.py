@@ -1,4 +1,3 @@
-import itertools
 import re
 
 __title__ = 'HumanRegex'
@@ -7,15 +6,17 @@ __author__ = 'Marcelo Fonseca Tambalo'
 
 
 class HumanMatch(dict):
-    def __getitem__(self, y):
+    def __getitem__(self, item):
         try:
-            return super(HumanMatch, self).__getitem__(y)
+            return super(HumanMatch, self).__getitem__(item)
         except KeyError:
             return None
 
-    def get(self, k, d=None):
-        ret = super(HumanMatch, self).get(k, d)
-        return d if ret is None else ret
+    def get(self, key, default=None):
+        r = super(HumanMatch, self).get(key, default)
+        if r is None:
+            return default
+        return r
 
 
 class HumanRegex(str):
@@ -44,78 +45,70 @@ class HumanRegex(str):
         self.pattern = self.prefixes + self.source + self.suffixes
         return self
 
-    def any(self, value):
-        return self.add("[" + re.escape(value) + "]")
+    def any(self, value, name=None):
+        return self.add("[" + re.escape(value) + "]", name=name)
 
-    def anything(self):
-        return self.add("(?:.*)")
+    def anything(self, name=None):
+        return self.add(r"(?:.*)", name=name)
 
-    def anything_but(self, value):
-        return self.add("(?:[^" + re.escape(value) + "]*)")
+    def anything_but(self, value, name=None):
+        return self.add("(?:[^" + re.escape(value) + "]*)", name=name)
 
     def br(self):
         return self.add(r"(?:(?:\n)|(?:\r\n))")
 
-    def digit(self):
-        return self.add(r"\d")
+    def digit(self, name=None):
+        return self.add(r"\d", name=name)
 
-    def digits(self):
-        return self.add(r"\d+")
+    def digits(self, name=None):
+        return self.add(r"\d+", name=name)
 
-    def non_digit(self):
-        return self.add(r"\D")
+    def non_digit(self, name=None):
+        return self.add(r"\D", name=name)
 
-    def non_digits(self):
-        return self.add(r"\D+")
+    def non_digits(self, name=None):
+        return self.add(r"\D+", name=name)
 
     def end_of_line(self, enable=True):
         self.suffixes = "$" if enable else ""
         return self.add()
 
-    def maybe(self, value):
-        return self.add("(?:" + re.escape(value) + ")?")
+    def maybe(self, value, name=None):
+        return self.add("(?:" + re.escape(value) + ")?", name=name)
 
     def multiple(self):
-        return self.add("+")
+        return self.add(r"+")
     s = multiple
 
     def OR(self, value=None):
-        self.add("|")
+        self.add(r"|")
         return self.then(value) if value else self
 
     def range(self, *args, **kwargs):
         name = kwargs.pop('name', None)
-        if name is None:
-            f = r"([%s])"
-        else:
-            f = r"(?P<{name}>([%s]))".format(name=name)
         r = []
         for arg in args:
             if isinstance(arg, basestring):
                 r.append(re.escape(arg))
             else:
                 r.append("-".join(arg))
-        return self.add(f % ''.join(r))
+        return self.add(r"([%s])" % ''.join(r), name=name)
 
     def ranges(self, *args, **kwargs):
         name = kwargs.pop('name', None)
-        if name is None:
-            f = r"([%s]+)"
-        else:
-            f = r"(?P<{name}>([%s]+))".format(name=name)
         r = []
         for arg in args:
             if isinstance(arg, basestring):
                 r.append(re.escape(arg))
             else:
                 r.append("-".join(arg))
-        return self.add(f % ''.join(r))
+        return self.add(r"([%s]+)" % ''.join(r), name=name)
 
-    def something(self):
-        return self.add("(?:.+)")
+    def something(self, name=None):
+        return self.add(r"(?:.+)", name=name)
 
-    def something_but(self, value):
-        return self.add("(?:[^" + re.escape(value) + "]+)")
+    def something_but(self, value, name=None):
+        return self.add("(?:[^" + re.escape(value) + "]+)", name=name)
 
     def start_of_line(self, enable=True):
         self.prefixes = "^" if enable else ""
@@ -130,21 +123,21 @@ class HumanRegex(str):
     def non_whitespace(self):
         return self.add(r"\S")
 
-    def then(self, value):
-        return self.add("(?:" + re.escape(value) + ")")
+    def then(self, value, name=None):
+        return self.add("(?:" + re.escape(value) + ")", name=name)
     find = then
 
-    def word(self):
-        return self.add(r"\w+")
+    def word(self, name=None):
+        return self.add(r"\w+", name=name)
 
-    def non_word(self):
-        return self.add(r"\W+")
+    def non_word(self, name=None):
+        return self.add(r"\W+", name=name)
 
-    def char(self):
-        return self.add(r"\w")
+    def char(self, name=None):
+        return self.add(r"\w", name=name)
 
-    def non_char(self):
-        return self.add(r"\W")
+    def non_char(self, name=None):
+        return self.add(r"\W", name=name)
 
     def dotall(self, enable=True):
         self._dotall = enable
@@ -199,9 +192,10 @@ class HumanRegex(str):
     def groupdict(self, string):
         result = HumanMatch()
         match = self.search(string)
-        result[0] = match.group()
-        result.update(enumerate(match.groups(), start=1))
-        result.update(match.groupdict())
+        if match:
+            result[0] = match.group()
+            result.update(enumerate(match.groups(), start=1))
+            result.update(match.groupdict())
         return result
 
     def match(self, string):
@@ -341,19 +335,19 @@ def ADD(value, name=None): return HR().add(value, name=name)
 RE = ADD
 
 
-def T(value, name=None): return HR().then(value)
+def T(value, name=None): return HR().then(value, name=name)
 
 
-def F(value, name=None): return HR().find(value)
+def F(value, name=None): return HR().find(value, name=name)
 
 
-def A(value, name=None): return HR().any(value)
+def A(value, name=None): return HR().any(value, name=name)
 
 
-def AT(): return HR().anything()
+def AT(name=None): return HR().anything(name, name=name)
 
 
-def ATB(value, name=None): return HR().anything_but(value)
+def ATB(value, name=None): return HR().anything_but(value, name=name)
 
 
 def EOL(): return HR().end_of_line()
@@ -383,16 +377,16 @@ def SOL(): return HR().start_of_line()
 def BR(): return HR().br()
 
 
-def D(): return HR().digit()
+def D(name=None): return HR().digit(name=name)
 
 
-def DS(): return HR().digits()
+def DS(name=None): return HR().digits(name=name)
 
 
-def ND(): return HR().non_digit()
+def ND(name=None): return HR().non_digit(name=name)
 
 
-def NDS(): return HR().non_digits()
+def NDS(name=None): return HR().non_digits(name=name)
 
 
 def TAB(): return HR().tab()
@@ -404,47 +398,25 @@ def WS(): return HR().whitespace()
 def NWS(): return HR().non_whitespace()
 
 
-def W(): return HR().word()
+def W(name=None): return HR().word(name=name)
 
 
-def NW(): return HR().non_word()
+def NW(name=None): return HR().non_word(name=name)
 
 
-def C(): return HR().char()
+def C(name=None): return HR().char(name=name)
 
 
-def NC(): return HR().non_char()
+def NC(name=None): return HR().non_char(name=name)
 
 
 if __name__ == '__main__':
-    print (FI() & F("CAT")).replace("this is a cat", "dog")
-
-    if F('dog').test('This is a dog'):
-        print 'Oh yeah'
-
-    re09 = RS(('0', '9'))
-    if re09.test('My lucky 25 number'):
-        print '1: Number found'
-    if re09.findall('My lucky 25 number')[0] == '25':
-        print '2: Number found'
-    re09_number = RS(('0', '9'), name='number')
-    if re09_number.groupdict('My lucky 25 number')['number'] == '25':
-        print '3: Number found'
-    print re09_number.groupdict('My lucky 25 number')['no_such_group']
-    # None
-
-    if bool(re09_number('My lucky 25 number')):
-        print '4: Number found'
-    if re09_number('My lucky 25 number')[0] == '25':
-        print '5: Number found'
-    if re09_number('My lucky 25 number')['number'] == '25':
-        print '6: Number found'
-    print re09_number('My lucky 25 number')['no_such_group']
-    # None
-
-    print bool(RE('[0-9]+', name='number')('My lucky 25 number'))
+    print bool(D()('My lucky 25 number'))
     # True
-    print RE('[0-9]+', name='number')('My lucky 25 number')[0]
+    print RE('[0-9]+')('My lucky 25 number')[0]
     # 25
     print RE('[0-9]+', name='number')('My lucky 25 number')['number']
     # 25
+
+    f = "Thomazini faz pilates"
+    print HR().then('t', name='x').ignorecase().anything_but('r', name='rtr')(f)
