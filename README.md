@@ -104,7 +104,7 @@ print HR().find('red').replace("violets are red", 'blue')
 ### Combinations
 
 ```python
-alids = ['abacate', '42', 'tomate', '25']
+valids = ['abacate', '42', 'tomate', '25']
 
 valid_comb = T(valids[0])
 for valid in valids[1:]:
