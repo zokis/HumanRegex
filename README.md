@@ -63,7 +63,9 @@ print email_match['provider']
 Flags
 
 ```python
-simple_email_re = FI() & W(name='account') & (FS() | FM() | FU()) & T('@') & W(name='provider') & T('.') & W()
+simple_email_re = FI() & W(name='account') & (
+        FS() | FM() | FU()
+    ) & T('@') & W(name='provider') & T('.') & W()
 simple_email_match = simple_email_re('my_email_3@prOvider.com')
 print simple_email_match['account']
 # >> my_email_3
