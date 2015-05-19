@@ -98,3 +98,41 @@ print simple_email_match['account']
 print simple_email_match['provider']
 # >> provIder
 ```
+
+
+LIST:
+
+    ADD .add
+    RE  .add
+    T   .then
+    F   .find
+    A   .any
+    AT  .anything  
+    ATB .anything_but
+    EOL .end_of_line
+    MB  .maybe
+    MTP .multiple
+    R   .range
+    RS  .ranges
+    ST  .something
+    STB .something_but
+    SOL .start_of_line
+    BR  .br
+    D   .digit
+    DS  .digits
+    ND  .non_digit
+    NDS .non_digits
+    TAB .tab
+    WS  .whitespace
+    NWS .non_whitespace
+    W   .word
+    NW  .non_word
+    C   .char
+    NC  .non_char
+
+    FS .dotall      .S
+    FI .ignorecase  .I
+    FL .locale      .L
+    FM .multiline   .M
+    FU .unicode     .U
+    FX .verbose     .X
