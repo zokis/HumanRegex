@@ -104,23 +104,28 @@ print HR().find('red').replace("violets are red", 'blue')
 ### Combinations
 
 ```python
+from humanregex import HR
+
+
 valids = ['abacate', '42', 'tomate', '25']
 
-valid_comb = T(valids[0])
+valid_comb = HR().then(valids[0])
+# same as valid_comb = T(valids[0])
 for valid in valids[1:]:
-    valid_comb |= T(valid)
+    valid_comb |= HR().then(valid)
+    # same as valid_comb |= T(valid)
 
 valids = ADD(valid_comb, name='valid')
-my_combination = SOL() & T('{') & valids & T('}') & EOL()
-print my_combination
+my_comb = HR().then('{').start_of_line() & valids & HR().then('}').end_of_line()
+# same as my_comb = SOL() & T('{') & valids & T('}') & EOL()
+print my_comb
 # >> ^(?:\{)(?P<valid>(?:abacate)|(?:42)|(?:tomate)|(?:25))(?:\})$
-print my_combination('{42}')['valid']
+print my_comb('{42}')['valid']
 # >> 42
-print my_combination('{abacate}')['valid']
+print my_comb('{abacate}')['valid']
 # >> abacate
-print my_combination('{invalid}')['valid']
+print my_comb('{invalid}')['valid']
 # >> None
-
 
 x = HR().then('@').word(name='p')
 y = HR().char(name='c').then('.')
