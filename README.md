@@ -20,11 +20,11 @@ It has a verbose api to create regex and with shortcuts, both supported the comb
 ```python
 from humanregex import RE
 
-my_regex = RE('[0-9]+')
-if bool(my_regex('number: 25')):
+my_re = RE('[0-9]+')
+if bool(my_re('number: 25')):
     print 'Regex Ok'
 # >> Regex Ok
-my_match = my_regex('number: 25')
+my_match = my_re('number: 25')
 if my_match[0] == '25':
     print '25'
 # >> 25
@@ -35,8 +35,8 @@ if RE('(?P<number>[0-9]+)')('number: 25')['number'] == '25':
 
 ### Tests if the email is valid and captures the account and the provider
 ```python
-my_regex = RE(r'(?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)')
-my_match = my_regex('my_email.1+github@Provider.com')
+my_re = RE(r'(?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)')
+my_match = my_re('my_email.1+github@Provider.com')
 print my_match['account']
 # >> my_email.1+github
 print my_match['provider']
@@ -55,11 +55,11 @@ print RE('(?:red)').replace("violets are red", 'blue')
 ```python
 from humanregex import HumanRegex as HR
 
-my_regex = HR().digits()
-if bool(my_regex('number: 25')):
+my_re = HR().digits()
+if bool(my_re('number: 25')):
     print 'Regex Ok'
 # >> Regex Ok
-my_match = my_regex('number: 25')
+my_match = my_re('number: 25')
 if my_match[0] == '25':
     print '25'
 # >> 25
@@ -77,7 +77,7 @@ AZ = ['A', 'Z']
 _09 = ['0', '9']
 special = '_.+'
 
-my_regex = HR().ranges(
+my_re = HR().ranges(
     AZ, az,
     _09, special,
     name='account'
@@ -85,8 +85,8 @@ my_regex = HR().ranges(
     AZ, az, _09,
     name='provider'
 ).then('.').anything()
-my_match = my_regex('my_email.1+github@Provider.com')
-print my_regex
+my_match = my_re('my_email.1+github@Provider.com')
+print my_re
 # >> (?P<account>([A-Za-z0-9\_\.\+]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.*)
 print my_match['account']
 # >> my_email.1+github
@@ -130,14 +130,14 @@ print "p: ", my_match['p']
 ```python
 from humanregex import RS
 
-my_regex = DS()
-print my_regex
+my_re = DS()
+print my_re
 # >> \d+
 
-if bool(my_regex('number: 25')):
+if bool(my_re('number: 25')):
     print 'Regex Ok'
 # >> Regex Ok
-my_match = my_regex('number: 25')
+my_match = my_re('number: 25')
 if my_match[0] == '25':
     print '25'
 # >> 25
@@ -158,15 +158,15 @@ AZ = ['A', 'Z']
 _09 = ['0', '9']
 special = '_.+'
 
-my_regex = RS(
+my_re = RS(
     AZ, az, _09, special,
     name='account'
 ) & T('@') & RS(
     AZ, az, _09,
     name='provider'
 ) & AT()
-my_match = my_regex('my_email.1+github@Provider.com')
-print my_regex
+my_match = my_re('my_email.1+github@Provider.com')
+print my_re
 # >> (?P<account>([A-Za-z0-9\_\.\+]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:.*)
 print my_match['account']
 # >> my_email.1+github
