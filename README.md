@@ -25,7 +25,9 @@ if RE('(?P<number>[0-9]+)')('number: 25')['number'] == '25':
 my_regex = RE(r'(?P<account>([A-Za-z0-9\+\_\.]+))(?:\@)(?P<provider>([A-Za-z0-9]+))(?:\.)(?:.+)')
 my_match = my_regex('my_email.1+github@Provider.com')
 print my_match['account']
+# >> my_email.1+github
 print my_match['provider']
+# >> Provider
 ```
 
 ### Replacing strings
