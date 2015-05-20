@@ -68,7 +68,7 @@ class HumanRegex(str):
         return self.add("(?:[^" + self.escape(value) + "]*)", name=name)
 
     def br(self):
-        return self.add(r"(?:(?:\n)|(?:\r\n))")
+        return self.add(r"(?:\n|\r\n)")
 
     def digit(self, name=None, quantifier=None):
         return self.add(r"\d", name=name, quantifier=quantifier)
