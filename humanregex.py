@@ -452,7 +452,7 @@ if __name__ == '__main__':
     p = T('.')
     cpf_re = d3 & p & d3 & p & d3 & t & d2
     print cpf_re
-    print bool(cpf_re('403.918.858-63'))
+    print bool(cpf_re('794.952.448-03'))
 
     cnpj_re = d2 & p & d3 & p & d3 & T('/') & D(quantifier=4) & t & d2
     print cnpj_re
@@ -460,5 +460,5 @@ if __name__ == '__main__':
 
     cpf_cnpj_re = G(cpf_re) | G(cnpj_re)
     print cpf_cnpj_re
-    print bool(cpf_cnpj_re('403.918.858-63'))
+    print bool(cpf_cnpj_re('504.148.716-26'))
     print bool(cpf_cnpj_re('18.880.515/0001-99'))

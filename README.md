@@ -205,7 +205,7 @@ p = T('.')
 cpf_re = d3 & p & d3 & p & d3 & t & d2
 print cpf_re
 # >> \d{3}(?:\.)\d{3}(?:\.)\d{3}(?:\-)\d\d
-print bool(cpf_re('403.918.858-63'))
+print bool(cpf_re('412.459.786-08'))
 # >> True
 
 cnpj_re = d2 & p & d3 & p & d3 & T('/') & D(quantifier=4) & t & d2
@@ -217,7 +217,7 @@ print bool(cnpj_re('18.880.515/0001-99'))
 cpf_cnpj_re = G(cpf_re) | G(cnpj_re)
 print cpf_cnpj_re
 # >> (\d{3}(?:\.)\d{3}(?:\.)\d{3}(?:\-)\d\d)|(\d\d(?:\.)\d{3}(?:\.)\d{3}(?:\/)\d{4}(?:\-)\d\d)
-print bool(cpf_cnpj_re('403.918.858-63'))
+print bool(cpf_cnpj_re('856.324.440-07'))
 # >> True
 print bool(cpf_cnpj_re('18.880.515/0001-99'))
 # >> True
