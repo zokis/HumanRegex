@@ -39,10 +39,18 @@ class HumanRegex(str):
     def escape(self, value):
         return re.escape(value)
 
-    def add(self, value=None, name=None):
+    def add(self, value=None, name=None, quantifier=None):
         if value is not None:
             if isinstance(value, HumanRegex):
                 value = str(value)
+            if quantifier is not None:
+                if isinstance(quantifier, int):
+                    value = "%s{%d}" % (value, quantifier)
+                else:
+                    if len(quantifier) == 1:
+                        value = "%s{%d,}" % (value, quantifier[0])
+                    else:
+                        value = "%s{%d,%d}" % (value, quantifier[0], quantifier[1])
             if name is None:
                 self.source += value
             else:
@@ -50,8 +58,8 @@ class HumanRegex(str):
         self.pattern = self.prefixes + self.source + self.suffixes
         return self
 
-    def any(self, value, name=None):
-        return self.add("[" + self.escape(value) + "]", name=name)
+    def any(self, value, name=None, quantifier=None):
+        return self.add("[" + self.escape(value) + "]", name=name, quantifier=quantifier)
 
     def anything(self, name=None):
         return self.add(r"(?:.*)", name=name)
@@ -62,8 +70,8 @@ class HumanRegex(str):
     def br(self):
         return self.add(r"(?:(?:\n)|(?:\r\n))")
 
-    def digit(self, name=None):
-        return self.add(r"\d", name=name)
+    def digit(self, name=None, quantifier=None):
+        return self.add(r"\d", name=name, quantifier=quantifier)
 
     def digits(self, name=None):
         return self.add(r"\d+", name=name)
@@ -75,8 +83,8 @@ class HumanRegex(str):
             value = self.escape(value)
         return self.add("(" + value + ")", name=name)
 
-    def non_digit(self, name=None):
-        return self.add(r"\D", name=name)
+    def non_digit(self, name=None, quantifier=None):
+        return self.add(r"\D", name=name, quantifier=quantifier)
 
     def non_digits(self, name=None):
         return self.add(r"\D+", name=name)
@@ -98,13 +106,14 @@ class HumanRegex(str):
 
     def range(self, *args, **kwargs):
         name = kwargs.pop('name', None)
+        quantifier = kwargs.pop('quantifier', None)
         r = []
         for arg in args:
             if isinstance(arg, basestring):
                 r.append(self.escape(arg))
             else:
                 r.append("-".join(arg))
-        return self.add(r"([%s])" % ''.join(r), name=name)
+        return self.add(r"[%s]" % ''.join(r), name=name, quantifier=quantifier)
 
     def ranges(self, *args, **kwargs):
         name = kwargs.pop('name', None)
@@ -114,42 +123,42 @@ class HumanRegex(str):
                 r.append(self.escape(arg))
             else:
                 r.append("-".join(arg))
-        return self.add(r"([%s]+)" % ''.join(r), name=name)
+        return self.add(r"[%s]+" % ''.join(r), name=name)
 
-    def something(self, name=None):
-        return self.add(r"(?:.+)", name=name)
+    def something(self, name=None, quantifier=None):
+        return self.add(r"(?:.+)", name=name, quantifier=quantifier)
 
-    def something_but(self, value, name=None):
-        return self.add("(?:[^" + self.escape(value) + "]+)", name=name)
+    def something_but(self, value, name=None, quantifier=None):
+        return self.add("(?:[^" + self.escape(value) + "]+)", name=name, quantifier=quantifier)
 
     def start_of_line(self, enable=True):
         self.prefixes = "^" if enable else ""
         return self.add()
 
-    def tab(self):
-        return self.add(r"\t")
+    def tab(self, quantifier=None):
+        return self.add(r"\t", quantifier=quantifier)
 
-    def whitespace(self):
-        return self.add(r"\s")
+    def whitespace(self, quantifier=None):
+        return self.add(r"\s", quantifier=quantifier)
 
-    def non_whitespace(self):
-        return self.add(r"\S")
+    def non_whitespace(self, quantifier=None):
+        return self.add(r"\S", quantifier=quantifier)
 
-    def then(self, value, name=None):
-        return self.add("(?:" + self.escape(value) + ")", name=name)
+    def then(self, value, name=None, quantifier=None):
+        return self.add("(?:" + self.escape(value) + ")", name=name, quantifier=quantifier)
     find = then
 
     def word(self, name=None):
         return self.add(r"\w+", name=name)
 
     def non_word(self, name=None):
-        return self.add(r"\W+", name=name)
+        return self.add(r"\W+")
 
-    def char(self, name=None):
-        return self.add(r"\w", name=name)
+    def char(self, name=None, quantifier=None):
+        return self.add(r"\w", name=name, quantifier=quantifier)
 
-    def non_char(self, name=None):
-        return self.add(r"\W", name=name)
+    def non_char(self, name=None, quantifier=None):
+        return self.add(r"\W", name=name, quantifier=quantifier)
 
     def dotall(self, enable=True):
         self._dotall = enable
@@ -240,6 +249,16 @@ class HumanRegex(str):
 
     def __call__(self, string):
         return self.groupdict(string)
+
+    def __mul__(self, other):
+        if isinstance(other, int):
+            return HR().add(str(self) * other)
+        raise TypeError(
+            "unsupported operand type(s) for *: '%s' and '%s'" % (
+                type(self).__name__,
+                type(other).__name__
+            )
+        )
 
     def _combine(self, other, op=_AND):
         if isinstance(other, Flag):
@@ -343,20 +362,20 @@ class FX(Flag):
     f = HR.verbose
 
 
-def ADD(value=None, name=None): return HR().add(value, name=name)
+def ADD(value=None, name=None, quantifier=None): return HR().add(value, name=name, quantifier=quantifier)
 RE = ADD
 
 
-def T(value, name=None): return HR().then(value, name=name)
+def T(value, name=None, quantifier=None): return HR().then(value, name=name, quantifier=quantifier)
 
 
-def F(value, name=None): return HR().find(value, name=name)
+def F(value, name=None, quantifier=None): return HR().find(value, name=name, quantifier=quantifier)
 
 
 def G(value, name=None): return HR().group(value, name=name)
 
 
-def A(value, name=None): return HR().any(value, name=name)
+def A(value, name=None, quantifier=None): return HR().any(value, name=name, quantifier=quantifier)
 
 
 def AT(name=None): return HR().anything(name=name)
@@ -392,25 +411,25 @@ def SOL(enable=True): return HR().start_of_line(enable)
 def BR(): return HR().br()
 
 
-def D(name=None): return HR().digit(name=name)
+def D(name=None, quantifier=None): return HR().digit(name=name, quantifier=quantifier)
 
 
 def DS(name=None): return HR().digits(name=name)
 
 
-def ND(name=None): return HR().non_digit(name=name)
+def ND(name=None, quantifier=None): return HR().non_digit(name=name, quantifier=quantifier)
 
 
 def NDS(name=None): return HR().non_digits(name=name)
 
 
-def TAB(): return HR().tab()
+def TAB(quantifier=None): return HR().tab(quantifier=quantifier)
 
 
-def WS(): return HR().whitespace()
+def WS(quantifier=None): return HR().whitespace(quantifier=quantifier)
 
 
-def NWS(): return HR().non_whitespace()
+def NWS(quantifier=None): return HR().non_whitespace(quantifier=quantifier)
 
 
 def W(name=None): return HR().word(name=name)
@@ -419,29 +438,27 @@ def W(name=None): return HR().word(name=name)
 def NW(name=None): return HR().non_word(name=name)
 
 
-def C(name=None): return HR().char(name=name)
+def C(name=None, quantifier=None): return HR().char(name=name, quantifier=quantifier)
 
 
-def NC(name=None): return HR().non_char(name=name)
+def NC(name=None, quantifier=None): return HR().non_char(name=name, quantifier=quantifier)
 
 
 if __name__ == '__main__':
-    valids = ['abacate', '42', 'tomate', '25']
+    d3 = D(quantifier=3)
+    d2 = D() * 2
 
-    valid_comb = HR().then(valids[0])
-    # same as valid_comb = T(valids[0])
-    for valid in valids[1:]:
-        valid_comb |= HR().then(valid)
-        # same as valid_comb |= T(valid)
+    t = T('-')
+    p = T('.')
+    cpf_re = d3 & p & d3 & p & d3 & t & d2
+    print cpf_re
+    print bool(cpf_re('403.918.858-63'))
 
-    valids = ADD(valid_comb, name='valid')
-    my_comb = HR().then('{').start_of_line() & valids & HR().then('}').end_of_line()
-    # same as my_comb = SOL() & T('{') & valids & T('}') & EOL()
-    print my_comb
-    # >> ^(?:\{)(?P<valid>(?:abacate)|(?:42)|(?:tomate)|(?:25))(?:\})$
-    print my_comb('{42}')['valid']
-    # >> 42
-    print my_comb('{abacate}')['valid']
-    # >> abacate
-    print my_comb('{invalid}')['valid']
-    # >> None
+    cnpj_re = d2 & p & d3 & p & d3 & T('/') & D(quantifier=4) & t & d2
+    print cnpj_re
+    print bool(cnpj_re('18.880.515/0001-99'))
+
+    cpf_cnpj_re = G(cpf_re) | G(cnpj_re)
+    print cpf_cnpj_re
+    print bool(cpf_cnpj_re('403.918.858-63'))
+    print bool(cpf_cnpj_re('18.880.515/0001-99'))
