@@ -219,7 +219,7 @@ print cpf_cnpj_re
 # >> (\d{3}(?:\.)\d{3}(?:\.)\d{3}(?:\-)\d\d)|(\d\d(?:\.)\d{3}(?:\.)\d{3}(?:\/)\d{4}(?:\-)\d\d)
 print bool(cpf_cnpj_re('856.324.440-07'))
 # >> True
-print bool(cpf_cnpj_re('18.880.515/0001-99'))
+print bool(cpf_cnpj_re('49.347.475/0001-48'))
 # >> True
 ```
 

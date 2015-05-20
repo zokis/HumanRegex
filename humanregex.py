@@ -461,4 +461,4 @@ if __name__ == '__main__':
     cpf_cnpj_re = G(cpf_re) | G(cnpj_re)
     print cpf_cnpj_re
     print bool(cpf_cnpj_re('504.148.716-26'))
-    print bool(cpf_cnpj_re('18.880.515/0001-99'))
+    print bool(cpf_cnpj_re('56.435.246/0001-40'))
