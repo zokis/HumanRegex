@@ -456,7 +456,7 @@ if __name__ == '__main__':
 
     cnpj_re = d2 & p & d3 & p & d3 & T('/') & D(quantifier=4) & t & d2
     print cnpj_re
-    print bool(cnpj_re('18.880.515/0001-99'))
+    print bool(cnpj_re('11.247.544/0001-79'))
 
     cpf_cnpj_re = G(cpf_re) | G(cnpj_re)
     print cpf_cnpj_re

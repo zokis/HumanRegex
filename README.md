@@ -211,7 +211,7 @@ print bool(cpf_re('412.459.786-08'))
 cnpj_re = d2 & p & d3 & p & d3 & T('/') & D(quantifier=4) & t & d2
 print cnpj_re
 # >> \d\d(?:\.)\d{3}(?:\.)\d{3}(?:\/)\d{4}(?:\-)\d\d
-print bool(cnpj_re('18.880.515/0001-99'))
+print bool(cnpj_re('76.612.217/0001-14'))
 # >> True
 
 cpf_cnpj_re = G(cpf_re) | G(cnpj_re)
