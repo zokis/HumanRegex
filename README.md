@@ -278,6 +278,7 @@ print bool(my_match)
 | BR       | .br             | BR()                  | ``(?:\n|\r\n)        `` | ✗ | ✗ | ✗ |
 | D        | .digit          | D()                   | ``\d                 `` | ✗ | ✓ | ✓ |
 | DS       | .digits         | DS()                  | ``\d+                `` | ✗ | ✓ | ✗ |
+| DS       | .int_or_decimal | ID()                  | ``(?:\d*\.)?\d+      `` | ✗ | ✓ | ✗ |
 | ND       | .non_digit      | ND()                  | ``\D                 `` | ✗ | ✓ | ✓ |
 | NDS      | .non_digits     | NDS()                 | ``\D+                `` | ✗ | ✓ | ✗ |
 | TAB      | .tab            | TAB()                 | ``\t                 `` | ✗ | ✗ | ✓ |
