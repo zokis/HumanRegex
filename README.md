@@ -18,7 +18,7 @@ It has a verbose api to create regex and with shortcuts, both supported the comb
 
 ### Testing if the string contains digits
 ```python
-from humanregex import RE
+from hre import RE
 
 my_re = RE('[0-9]+')
 if bool(my_re('number: 25')):
@@ -45,7 +45,7 @@ print my_match['provider']
 
 ### Replacing strings
 ```python
-from humanregex import RE
+from hre import RE
 
 print RE('(?:red)').replace("violets are red", 'blue')
 # >> violets are blue
@@ -53,7 +53,7 @@ print RE('(?:red)').replace("violets are red", 'blue')
 
 ### Using verbal expressions for the same examples
 ```python
-from humanregex import HumanRegex as HR
+from hre import HumanRegex as HR
 
 my_re = HR().digits()
 if bool(my_re('number: 25')):
@@ -70,7 +70,7 @@ if HR().digits(name='number')('number: 25')['number'] == '25':
 ```
 
 ```python
-from humanregex import HumanRegex as HR
+from hre import HumanRegex as HR
 
 az = ['a', 'z']
 AZ = ['A', 'Z']
@@ -95,7 +95,7 @@ print my_match['provider']
 ```
 
 ```python
-from humanregex import HR
+from hre import HR
 
 print HR().find('red').replace("violets are red", 'blue')
 # >> violets are blue
@@ -104,7 +104,7 @@ print HR().find('red').replace("violets are red", 'blue')
 ### Combinations
 
 ```python
-from humanregex import HR
+from hre import HR
 
 
 valids = ['abacate', '42', 'tomate', '25']
@@ -143,7 +143,7 @@ print "p: ", my_match['p']
 ### Examples using shortcuts and combinations
 
 ```python
-from humanregex import RS
+from hre import RS
 
 my_re = DS()
 print my_re
@@ -166,7 +166,7 @@ if my_named_regex('number: 25')['number'] == '25':
 ```
 
 ```python
-from humanregex import RS, T, AT
+from hre import RS, T, AT
 
 az = ['a', 'z']
 AZ = ['A', 'Z']
@@ -190,7 +190,7 @@ print my_match['provider']
 ```
 
 ```python
-from humanregex import F
+from hre import F
 
 print F('red').replace("violets are red", 'blue')
 # >> violets are blue
