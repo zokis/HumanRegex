@@ -70,6 +70,9 @@ class HumanRegex(str):
     def br(self):
         return self.add(r"(?:\n|\r\n)")
 
+    def int_or_decimal(self, name=None):
+        return self.add(r"(?:\d*\.)?\d+", name=name)
+
     def digit(self, name=None, quantifier=None):
         return self.add(r"\d", name=name, quantifier=quantifier)
 
@@ -415,6 +418,9 @@ def D(name=None, quantifier=None): return HR().digit(name=name, quantifier=quant
 
 
 def DS(name=None): return HR().digits(name=name)
+
+
+def ID(name=None): return HR().int_or_decimal(name=name)
 
 
 def ND(name=None, quantifier=None): return HR().non_digit(name=name, quantifier=quantifier)
