@@ -5,7 +5,8 @@ from setuptools import setup
 setup(
     name='hre',
     version='0.1.0',
-    description='helper for manipulating regex.',
+    description='hre (Human Regex) is an API to make it easier to use Regex.',
+    long_description='hre (Human Regex) is an API to make it easier to use Regex.',
     url='https://github.com/zokis/HumanRegex/',
     author='Marcelo Fonseca Tambalo',
     author_email='marcelo.zokis@gmail.com',
