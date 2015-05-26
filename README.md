@@ -1,5 +1,11 @@
 HumanRegex
-=======================
+==========
+
+## Install
+
+```sh
+pip install hre
+```
 
 API to make it easier to use regex
 
