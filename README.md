@@ -1,6 +1,9 @@
 HumanRegex
 ==========
 
+
+[![Build Status](https://travis-ci.org/zokis/HumanRegex.svg?branch=master)](https://travis-ci.org/zokis/HumanRegex)
+
 ## Install
 
 ```sh
