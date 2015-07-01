@@ -2,7 +2,7 @@ HumanRegex
 ==========
 
 
-[![Build Status](https://travis-ci.org/zokis/HumanRegex.svg?branch=master)](https://travis-ci.org/zokis/HumanRegex)
+[![Build Status](https://travis-ci.org/zokis/HumanRegex.svg?branch=master)](https://travis-ci.org/zokis/HumanRegex) [![PyPI version](https://badge.fury.io/py/hre.svg)](http://badge.fury.io/py/hre)
 
 ## Install
 
