@@ -1,7 +1,7 @@
 import re
 
 __title__ = 'HumanRegex'
-__version__ = '0.1.1'
+__version__ = '0.1.2'
 __author__ = 'Marcelo Fonseca Tambalo'
 
 
@@ -309,6 +309,9 @@ class Flags(set):
             return other & self
         return super(Flags, self).__and__(other)
 
+    def __int__(self):
+        return reduce(int.__or__, map(int, self or [0]))
+
 
 class Flag(object):
     def __init__(self, enable=True):
@@ -340,29 +343,38 @@ class Flag(object):
     def __repr__(self):
         return self.f.__name__
 
+    def __int__(self):
+        return self.v
+
 
 class FS(Flag):
     f = HR.dotall
+    v = re.S
 
 
 class FI(Flag):
     f = HR.ignorecase
+    v = re.I
 
 
 class FL(Flag):
     f = HR.locale
+    v = re.L
 
 
 class FM(Flag):
     f = HR.multiline
+    v = re.M
 
 
 class FU(Flag):
     f = HR.unicode
+    v = re.U
 
 
 class FX(Flag):
     f = HR.verbose
+    v = re.X
 
 
 def ADD(value=None, name=None, quantifier=None): return HR().add(value, name=name, quantifier=quantifier)
@@ -448,23 +460,3 @@ def C(name=None, quantifier=None): return HR().char(name=name, quantifier=quanti
 
 
 def NC(name=None, quantifier=None): return HR().non_char(name=name, quantifier=quantifier)
-
-
-if __name__ == '__main__':
-    d3 = D(quantifier=3)
-    d2 = D() * 2
-
-    t = T('-')
-    p = T('.')
-    cpf_re = d3 & p & d3 & p & d3 & t & d2
-    print cpf_re
-    print bool(cpf_re('794.952.448-03'))
-
-    cnpj_re = d2 & p & d3 & p & d3 & T('/') & D(quantifier=4) & t & d2
-    print cnpj_re
-    print bool(cnpj_re('11.247.544/0001-79'))
-
-    cpf_cnpj_re = G(cpf_re) | G(cnpj_re)
-    print cpf_cnpj_re
-    print bool(cpf_cnpj_re('504.148.716-26'))
-    print bool(cpf_cnpj_re('56.435.246/0001-40'))
