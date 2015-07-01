@@ -7,7 +7,9 @@ setup(
     name='hre',
     version=version,
     description='hre (Human Regex) is an API to make it easier to use Regex.',
-    long_description='hre (Human Regex) is an API to make it easier to use Regex.',
+    long_description='''hre (Human Regex) is an API to make it easier to use Regex.
+DOCS: https://github.com/zokis/HumanRegex/blob/master/README.md
+DOCS RAW: https://raw.githubusercontent.com/zokis/HumanRegex/master/README.md''',
     url='https://github.com/zokis/HumanRegex/',
     author='Marcelo Fonseca Tambalo',
     author_email='marcelo.zokis@gmail.com',

@@ -1,7 +1,7 @@
 import re
 
 __title__ = 'HumanRegex'
-__version__ = '0.1.2'
+__version__ = '0.1.4'
 __author__ = 'Marcelo Fonseca Tambalo'
 
 
