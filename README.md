@@ -31,14 +31,14 @@ from hre import RE
 
 my_re = RE('[0-9]+')
 if bool(my_re('number: 25')):
-    print 'Regex Ok'
+    print('Regex Ok')
 # >> Regex Ok
 my_match = my_re('number: 25')
 if my_match[0] == '25':
-    print '25'
+    print('25')
 # >> 25
 if RE('(?P<number>[0-9]+)')('number: 25')['number'] == '25':
-    print 'number 25'
+    print('number 25')
 # >> number 25
 ```
 
@@ -66,14 +66,14 @@ from hre import HumanRegex as HR
 
 my_re = HR().digits()
 if bool(my_re('number: 25')):
-    print 'Regex Ok'
+    print('Regex Ok')
 # >> Regex Ok
 my_match = my_re('number: 25')
 if my_match[0] == '25':
-    print '25'
+    print('25')
 # >> 25
 if HR().digits(name='number')('number: 25')['number'] == '25':
-    print 'number 25'
+    print('number 25')
 # >> number 25
 
 ```
@@ -152,25 +152,25 @@ print "p: ", my_match['p']
 ### Examples using shortcuts and combinations
 
 ```python
-from hre import RS
+from hre import DS
 
 my_re = DS()
 print my_re
 # >> \d+
 
 if bool(my_re('number: 25')):
-    print 'Regex Ok'
+    print('Regex Ok')
 # >> Regex Ok
 my_match = my_re('number: 25')
 if my_match[0] == '25':
-    print '25'
+    print('25')
 # >> 25
 
 my_named_regex = DS(name='number')
 print my_named_regex
 # >> (?P<number>\d+)
 if my_named_regex('number: 25')['number'] == '25':
-    print 'number 25'
+    print('number 25')
 # >> number 25
 ```
 
