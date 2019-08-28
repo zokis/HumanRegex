@@ -74,7 +74,7 @@ class TestHRE(unittest.TestCase):
 
         ops = ['', 'I', 'L', 'M', 'S', 'U', 'X']
         ops_s = ['', FI, FL, FM, FS, FU, FX]
-        for i in xrange(1, 8):
+        for i in range(1, 8):
             for cop in combinations(ops, i):
                 my_re = RE('x')
                 flags = 0

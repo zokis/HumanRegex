@@ -1,5 +1,10 @@
 import re
 
+
+from functools import reduce
+from operator import or_
+
+
 __title__ = 'HumanRegex'
 __version__ = '0.1.4'
 __author__ = 'Marcelo Fonseca Tambalo'
@@ -112,7 +117,7 @@ class HumanRegex(str):
         quantifier = kwargs.pop('quantifier', None)
         r = []
         for arg in args:
-            if isinstance(arg, basestring):
+            if isinstance(arg, str):
                 r.append(self.escape(arg))
             else:
                 r.append("-".join(arg))
@@ -122,7 +127,7 @@ class HumanRegex(str):
         name = kwargs.pop('name', None)
         r = []
         for arg in args:
-            if isinstance(arg, basestring):
+            if isinstance(arg, str):
                 r.append(self.escape(arg))
             else:
                 r.append("-".join(arg))
@@ -171,7 +176,7 @@ class HumanRegex(str):
     def ignorecase(self, enable=True):
         self._ignorecase = enable
         return self
-    I = ignorecase
+    I = ignorecase  # noqa
 
     def locale(self, enable=True):
         self._locale = enable
@@ -187,7 +192,8 @@ class HumanRegex(str):
         self._unicode = enable
         return self
 
-    def U(self, enable=True): return self.unicode(enable)
+    def U(self, enable=True):
+        return self.unicode(enable)
 
     def verbose(self, enable=True):
         self._verbose = enable
@@ -310,15 +316,20 @@ class Flags(set):
         return super(Flags, self).__and__(other)
 
     def __int__(self):
-        return reduce(int.__or__, map(int, self or [0]))
+        return reduce(or_, map(int, self or [0]))
 
 
 class Flag(object):
+    f_name = 'nill'
+
     def __init__(self, enable=True):
         self.enable = enable
 
+    def f(self, hr):
+        return getattr(HR, self.f_name)(hr, self.enable)
+
     def set(self, hr):
-        self.f(hr, self.enable)
+        self.f(hr)
 
     def __or__(self, other):
         if isinstance(other, Flag):
@@ -341,122 +352,152 @@ class Flag(object):
         )
 
     def __repr__(self):
-        return self.f.__name__
+        return self.f_name
 
     def __int__(self):
-        return self.v
+        return int(self.v)
 
 
 class FS(Flag):
-    f = HR.dotall
     v = re.S
+    f_name = 'dotall'
 
 
 class FI(Flag):
-    f = HR.ignorecase
     v = re.I
+    f_name = 'ignorecase'
 
 
 class FL(Flag):
-    f = HR.locale
     v = re.L
+    f_name = 'locale'
 
 
 class FM(Flag):
-    f = HR.multiline
     v = re.M
+    f_name = 'multiline'
 
 
 class FU(Flag):
-    f = HR.unicode
     v = re.U
+    f_name = 'unicode'
 
 
 class FX(Flag):
-    f = HR.verbose
     v = re.X
+    f_name = 'verbose'
 
 
-def ADD(value=None, name=None, quantifier=None): return HR().add(value, name=name, quantifier=quantifier)
+def ADD(value=None, name=None, quantifier=None):
+    return HR().add(value, name=name, quantifier=quantifier)
+
+
 RE = ADD
 
 
-def T(value, name=None, quantifier=None): return HR().then(value, name=name, quantifier=quantifier)
+def T(value, name=None, quantifier=None):
+    return HR().then(value, name=name, quantifier=quantifier)
 
 
-def F(value, name=None, quantifier=None): return HR().find(value, name=name, quantifier=quantifier)
+def F(value, name=None, quantifier=None):
+    return HR().find(value, name=name, quantifier=quantifier)
 
 
-def G(value, name=None): return HR().group(value, name=name)
+def G(value, name=None):
+    return HR().group(value, name=name)
 
 
-def A(value, name=None, quantifier=None): return HR().any(value, name=name, quantifier=quantifier)
+def A(value, name=None, quantifier=None):
+    return HR().any(value, name=name, quantifier=quantifier)
 
 
-def AT(name=None): return HR().anything(name=name)
+def AT(name=None):
+    return HR().anything(name=name)
 
 
-def ATB(value, name=None): return HR().anything_but(value, name=name)
+def ATB(value, name=None):
+    return HR().anything_but(value, name=name)
 
 
-def EOL(enable=True): return HR().end_of_line(enable)
+def EOL(enable=True):
+    return HR().end_of_line(enable)
 
 
-def MB(value, name=None): return HR().maybe(value)
+def MB(value, name=None):
+    return HR().maybe(value)
 
 
-def MTP(): return HR().multiple()
+def MTP():
+    return HR().multiple()
 
 
-def R(*args, **kwargs): return HR().range(*args, **kwargs)
+def R(*args, **kwargs):
+    return HR().range(*args, **kwargs)
 
 
-def RS(*args, **kwargs): return HR().ranges(*args, **kwargs)
+def RS(*args, **kwargs):
+    return HR().ranges(*args, **kwargs)
 
 
-def ST(name=None): return HR().something(name=name)
+def ST(name=None):
+    return HR().something(name=name)
 
 
-def STB(value, name=None): return HR().something_but(value, name=name)
+def STB(value, name=None):
+    return HR().something_but(value, name=name)
 
 
-def SOL(enable=True): return HR().start_of_line(enable)
+def SOL(enable=True):
+    return HR().start_of_line(enable)
 
 
-def BR(): return HR().br()
+def BR():
+    return HR().br()
 
 
-def D(name=None, quantifier=None): return HR().digit(name=name, quantifier=quantifier)
+def D(name=None, quantifier=None):
+    return HR().digit(name=name, quantifier=quantifier)
 
 
-def DS(name=None): return HR().digits(name=name)
+def DS(name=None):
+    return HR().digits(name=name)
 
 
-def ID(name=None): return HR().int_or_decimal(name=name)
+def ID(name=None):
+    return HR().int_or_decimal(name=name)
 
 
-def ND(name=None, quantifier=None): return HR().non_digit(name=name, quantifier=quantifier)
+def ND(name=None, quantifier=None):
+    return HR().non_digit(name=name, quantifier=quantifier)
 
 
-def NDS(name=None): return HR().non_digits(name=name)
+def NDS(name=None):
+    return HR().non_digits(name=name)
 
 
-def TAB(quantifier=None): return HR().tab(quantifier=quantifier)
+def TAB(quantifier=None):
+    return HR().tab(quantifier=quantifier)
 
 
-def WS(quantifier=None): return HR().whitespace(quantifier=quantifier)
+def WS(quantifier=None):
+    return HR().whitespace(quantifier=quantifier)
 
 
-def NWS(quantifier=None): return HR().non_whitespace(quantifier=quantifier)
+def NWS(quantifier=None):
+    return HR().non_whitespace(quantifier=quantifier)
 
 
-def W(name=None): return HR().word(name=name)
+def W(name=None):
+    return HR().word(name=name)
 
 
-def NW(name=None): return HR().non_word(name=name)
+def NW(name=None):
+    return HR().non_word(name=name)
 
 
-def C(name=None, quantifier=None): return HR().char(name=name, quantifier=quantifier)
+def C(name=None, quantifier=None):
+    return HR().char(name=name, quantifier=quantifier)
 
 
-def NC(name=None, quantifier=None): return HR().non_char(name=name, quantifier=quantifier)
+def NC(name=None, quantifier=None):
+    return HR().non_char(name=name, quantifier=quantifier)
