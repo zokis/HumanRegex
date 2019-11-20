@@ -1,3 +1,4 @@
+
 HumanRegex
 ==========
 
@@ -266,43 +267,43 @@ print bool(my_match)
  - column N: receives "name" as named parameter => Named groups
  - column Q: receives "quantifier" => {x};{x,};{x,y}
 
-| Shortcut | Verbose         | Example Shortcut      | Resulting               | V | N | Q |
-|----------|-----------------|-----------------------|-------------------------|---|---|---|
-| ADD      | .add            | ADD('[0-9]+')         | ``[0-9]+             `` | ✓ | ✓ | ✓ |
-| RE       | .add            | RE('[0-9]+')          | ``[0-9]+             `` | ✓ | ✓ | ✓ |
-| T        | .then           | T('@')                | ``(?:\@)             `` | ✓ | ✓ | ✓ |
-| F        | .find           | F('blue')             | ``(?:blue)           `` | ✓ | ✓ | ✓ |
-| G        | .group          | G(T('A')&#124;T('B')) | ``((?:A)|(?:B))      `` | ✓ | ✓ | ✗ |
-| A        | .any            | A('0258qaz')          | ``[0258qaz]          `` | ✓ | ✓ | ✓ |
-| AT       | .anything       | AT()                  | ``(?:.*)             `` | ✗ | ✓ | ✗ |
-| ATB      | .anything_but   | ATB('0258zaq')        | ``(?:[^0258zaq]*)    `` | ✓ | ✓ | ✗ |
-| EOL      | .end_of_line    | EOL()                 | ``$                  `` | ✗ | ✗ | ✗ |
-| MB       | .maybe          | MB('s')               | ``(?:s)?             `` | ✓ | ✓ | ✗ |
-| MTP      | .multiple       | MTP()                 | ``+                  `` | ✗ | ✗ | ✗ |
-| R        | .range          | R(['a', 'z'])         | ``[a-z]              `` | ✓ | ✓ | ✓ |
-| RS       | .ranges         | RS(['a', 'z'])        | ``[a-z]+             `` | ✓ | ✓ | ✗ |
-| ST       | .something      | ST()                  | ``(?:.+)             `` | ✗ | ✓ | ✗ |
-| STB      | .something_but  | STB('0258qaz')        | ``(?:[^0258qaz]+)    `` | ✓ | ✓ | ✗ |
-| SOL      | .start_of_line  | SOL()                 | ``^                  `` | ✗ | ✗ | ✗ |
-| BR       | .br             | BR()                  | ``(?:\n|\r\n)        `` | ✗ | ✗ | ✗ |
-| D        | .digit          | D()                   | ``\d                 `` | ✗ | ✓ | ✓ |
-| DS       | .digits         | DS()                  | ``\d+                `` | ✗ | ✓ | ✗ |
-| DS       | .int_or_decimal | ID()                  | ``(?:\d*\.)?\d+      `` | ✗ | ✓ | ✗ |
-| ND       | .non_digit      | ND()                  | ``\D                 `` | ✗ | ✓ | ✓ |
-| NDS      | .non_digits     | NDS()                 | ``\D+                `` | ✗ | ✓ | ✗ |
-| TAB      | .tab            | TAB()                 | ``\t                 `` | ✗ | ✗ | ✓ |
-| WS       | .whitespace     | WS()                  | ``\s                 `` | ✗ | ✗ | ✓ |
-| NWS      | .non_whitespace | NWS()                 | ``\S                 `` | ✗ | ✗ | ✓ |
-| W        | .word           | W()                   | ``\w+                `` | ✗ | ✓ | ✗ |
-| NW       | .non_word       | NW()                  | ``\W+                `` | ✗ | ✓ | ✗ |
-| C        | .char           | C()                   | ``\w                 `` | ✗ | ✓ | ✓ |
-| NC       | .non_char       | NC()                  | ``\W                 `` | ✗ | ✓ | ✓ |
-| FS       | .dotall/.S      | FS()                  | Flag dotall enabled     | ✗ | ✗ | ✗ |
-| FI       | .ignorecase/.I  | FI()                  | Flag ignorecase enabled | ✗ | ✗ | ✗ |
-| FL       | .locale/.L      | FL()                  | Flag locale enabled     | ✗ | ✗ | ✗ |
-| FM       | .multiline/.M   | FM()                  | Flag multiline enabled  | ✗ | ✗ | ✗ |
-| FU       | .unicode/.U     | FU()                  | Flag unicode enabled    | ✗ | ✗ | ✗ |
-| FX       | .verbose/.X     | FX()                  | Flag verbose enabled    | ✗ | ✗ | ✗ |
+| Shortcut | Verbose         | Example Shortcut      | Resulting                  | V | N | Q |
+|----------|-----------------|-----------------------|----------------------------|---|---|---|
+| ADD      | .add            | ADD('[0-9]+')         | ``[0-9]+             ``    | ✓ | ✓ | ✓ |
+| RE       | .add            | RE('[0-9]+')          | ``[0-9]+             ``    | ✓ | ✓ | ✓ |
+| T        | .then           | T('@')                | ``(?:\@)             ``    | ✓ | ✓ | ✓ |
+| F        | .find           | F('blue')             | ``(?:blue)           ``    | ✓ | ✓ | ✓ |
+| G        | .group          | G(T('A')&#124;T('B')) | ``((?:A)``&#124;``(?:B))`` | ✓ | ✓ | ✗ |
+| A        | .any            | A('0258qaz')          | ``[0258qaz]          ``    | ✓ | ✓ | ✓ |
+| AT       | .anything       | AT()                  | ``(?:.*)             ``    | ✗ | ✓ | ✗ |
+| ATB      | .anything_but   | ATB('0258zaq')        | ``(?:[^0258zaq]*)    ``    | ✓ | ✓ | ✗ |
+| EOL      | .end_of_line    | EOL()                 | ``$                  ``    | ✗ | ✗ | ✗ |
+| MB       | .maybe          | MB('s')               | ``(?:s)?             ``    | ✓ | ✓ | ✗ |
+| MTP      | .multiple       | MTP()                 | ``+                  ``    | ✗ | ✗ | ✗ |
+| R        | .range          | R(['a', 'z'])         | ``[a-z]              ``    | ✓ | ✓ | ✓ |
+| RS       | .ranges         | RS(['a', 'z'])        | ``[a-z]+             ``    | ✓ | ✓ | ✗ |
+| ST       | .something      | ST()                  | ``(?:.+)             ``    | ✗ | ✓ | ✗ |
+| STB      | .something_but  | STB('0258qaz')        | ``(?:[^0258qaz]+)    ``    | ✓ | ✓ | ✗ |
+| SOL      | .start_of_line  | SOL()                 | ``^                  ``    | ✗ | ✗ | ✗ |
+| BR       | .br             | BR()                  | ``(?:\n``&#124;``\r\n)``   | ✗ | ✗ | ✗ |
+| D        | .digit          | D()                   | ``\d                 ``    | ✗ | ✓ | ✓ |
+| DS       | .digits         | DS()                  | ``\d+                ``    | ✗ | ✓ | ✗ |
+| DS       | .int_or_decimal | ID()                  | ``(?:\d*\.)?\d+      ``    | ✗ | ✓ | ✗ |
+| ND       | .non_digit      | ND()                  | ``\D                 ``    | ✗ | ✓ | ✓ |
+| NDS      | .non_digits     | NDS()                 | ``\D+                ``    | ✗ | ✓ | ✗ |
+| TAB      | .tab            | TAB()                 | ``\t                 ``    | ✗ | ✗ | ✓ |
+| WS       | .whitespace     | WS()                  | ``\s                 ``    | ✗ | ✗ | ✓ |
+| NWS      | .non_whitespace | NWS()                 | ``\S                 ``    | ✗ | ✗ | ✓ |
+| W        | .word           | W()                   | ``\w+                ``    | ✗ | ✓ | ✗ |
+| NW       | .non_word       | NW()                  | ``\W+                ``    | ✗ | ✓ | ✗ |
+| C        | .char           | C()                   | ``\w                 ``    | ✗ | ✓ | ✓ |
+| NC       | .non_char       | NC()                  | ``\W                 ``    | ✗ | ✓ | ✓ |
+| FS       | .dotall/.S      | FS()                  | Flag dotall enabled        | ✗ | ✗ | ✗ |
+| FI       | .ignorecase/.I  | FI()                  | Flag ignorecase enabled    | ✗ | ✗ | ✗ |
+| FL       | .locale/.L      | FL()                  | Flag locale enabled        | ✗ | ✗ | ✗ |
+| FM       | .multiline/.M   | FM()                  | Flag multiline enabled     | ✗ | ✗ | ✗ |
+| FU       | .unicode/.U     | FU()                  | Flag unicode enabled       | ✗ | ✗ | ✗ |
+| FX       | .verbose/.X     | FX()                  | Flag verbose enabled       | ✗ | ✗ | ✗ |
 
 Other methods of regex object
 
